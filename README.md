@@ -6,8 +6,6 @@ multivarianttrafficoptimization
 Pyage in pip repository is broken, thus requires special
 handling.
 
-`-e git://github.com/maciek123/pyage.git#egg=pyage`
-
 ```bash
 $ virtualenv venv
 $ source ./venv/bin/activate # or .\venv\Scripts\activate.bat on Windows

@@ -15,7 +15,7 @@ $ mvn test
 
 Generate documentation:
 ```
-$ sbt doc
+$ mvn javadoc:javadoc
 ```
 
 Generate coverage report:

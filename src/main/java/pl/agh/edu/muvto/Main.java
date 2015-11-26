@@ -8,7 +8,8 @@ import org.slf4j.LoggerFactory;
  */
 public class Main
 {
-	private static final Logger logger = LoggerFactory.getLogger(Main.class);
+    private static final Logger logger = LoggerFactory.getLogger(Main.class);
+
     /**
      * Application entry point.
      * @param args commandline arguments

@@ -1,4 +1,4 @@
-package pl.agh.edu.muvto.solver.builder;
+package pl.edu.agh.muvto.solver.builder;
 
 import java.lang.reflect.Field;
 

@@ -1,4 +1,4 @@
-package pl.agh.edu.muvto.model;
+package pl.edu.agh.muvto.model;
 
 import org.jgrapht.EdgeFactory;
 import org.jgrapht.graph.DefaultDirectedWeightedGraph;

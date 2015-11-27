@@ -1,35 +1,31 @@
-package pl.agh.edu.muvto;
+package pl.edu.agh.muvto;
 
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.uma.jmetal.operator.CrossoverOperator;
-import org.uma.jmetal.operator.MutationOperator;
-import org.uma.jmetal.operator.SelectionOperator;
-import org.uma.jmetal.operator.impl.crossover.SinglePointCrossover;
-import org.uma.jmetal.operator.impl.mutation.BitFlipMutation;
-import org.uma.jmetal.operator.impl.selection.BinaryTournamentSelection;
-import org.uma.jmetal.problem.BinaryProblem;
-import org.uma.jmetal.problem.singleobjective.OneMax;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.stereotype.Component;
 import org.uma.jmetal.solution.BinarySolution;
 
 import fj.P;
 import fj.Try;
 import fj.data.Either;
 import fj.data.Stream;
-import pl.agh.edu.muvto.model.MuvtoEdge;
-import pl.agh.edu.muvto.model.MuvtoGraph;
-import pl.agh.edu.muvto.model.MuvtoVertex;
-import pl.agh.edu.muvto.solver.MuvtoSolver;
-import pl.agh.edu.muvto.solver.builder.GeneticAlgorithmBuilderExt;
+import pl.edu.agh.muvto.model.MuvtoEdge;
+import pl.edu.agh.muvto.model.MuvtoGraph;
+import pl.edu.agh.muvto.model.MuvtoVertex;
+import pl.edu.agh.muvto.solver.MuvtoProblem;
+import pl.edu.agh.muvto.solver.MuvtoSolver;
 
 /**
  * Main class.
  */
+@Component
 public class Main {
 
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
@@ -40,35 +36,37 @@ public class Main {
      */
     public static void main(String[] args) {
 
-        BinaryProblem problem = new OneMax(512) ;
+        @SuppressWarnings("resource")
+        ApplicationContext context = 
+                new ClassPathXmlApplicationContext("applicationContext.xml");
 
-        CrossoverOperator<BinarySolution> crossoverOperator =
-                new SinglePointCrossover(0.9);
+        (context.getBean(Main.class)).start(args);
+    }
 
-        MutationOperator<BinarySolution> mutationOperator =
-                new BitFlipMutation(1.0 / problem.getNumberOfBits(0));
+    @Autowired
+    private MuvtoSolver solver;
 
-        SelectionOperator<List<BinarySolution>, BinarySolution>
-            selectionOperator =
-                new BinaryTournamentSelection<BinarySolution>();
+    private void start(String[] args) {
 
-        GeneticAlgorithmBuilderExt<BinarySolution> builder =
-                (GeneticAlgorithmBuilderExt<BinarySolution>)
-                new GeneticAlgorithmBuilderExt<>(
-                        crossoverOperator,
-                        mutationOperator)
-                .setPopulationSize(100)
-                .setMaxEvaluations(25000)
-                .setSelectionOperator(selectionOperator);
+//        BinaryProblem problem = new OneMax(512) ;
 
-        MuvtoSolver solver = new MuvtoSolver(builder);
-
-        @SuppressWarnings("unused")
-        BinarySolution solution = solver.solve(problem);
+//        @SuppressWarnings("unused")
+//        BinarySolution solution = solver.solve(problem);
 
         loadGraph("test-graph-01.txt")
             .bimap(Util.liftVoid(Exception::printStackTrace),
-                   Util.liftVoid(graph -> logger.info(graph.toString())));
+                   Util.liftVoid(graph -> {
+
+                       logger.debug("graph: "+ graph);
+
+                       MuvtoProblem problem = new MuvtoProblem(graph);
+//                       BinaryProblem problem = new OneMax(512) ;
+                       
+                       @SuppressWarnings("unused")
+                       BinarySolution solution = solver.solve(problem);
+                       
+                       logger.debug("done");
+                   }));
     }
 
     /**
@@ -76,7 +74,7 @@ public class Main {
      * @param classpathFile
      * @return loaded graph or exception
      */
-    public static Either<Exception, MuvtoGraph>
+    private Either<Exception, MuvtoGraph>
         loadGraph(String classpathFile) {
 
         return Try.f(() -> {

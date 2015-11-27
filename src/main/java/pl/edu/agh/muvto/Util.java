@@ -1,4 +1,4 @@
-package pl.agh.edu.muvto;
+package pl.edu.agh.muvto;
 
 import java.util.function.Consumer;
 

@@ -1,4 +1,4 @@
-package pl.agh.edu.muvto.solver;
+package pl.edu.agh.muvto.solver;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,7 +7,7 @@ import org.uma.jmetal.problem.BinaryProblem;
 import org.uma.jmetal.solution.BinarySolution;
 import org.uma.jmetal.util.AlgorithmRunner;
 
-import pl.agh.edu.muvto.solver.builder.AlgorithmBuilderExt;
+import pl.edu.agh.muvto.solver.builder.AlgorithmBuilderExt;
 
 /**
  * Muvto solver.

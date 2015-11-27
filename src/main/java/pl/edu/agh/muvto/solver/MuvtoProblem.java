@@ -1,9 +1,9 @@
-package pl.agh.edu.muvto.solver;
+package pl.edu.agh.muvto.solver;
 
 import org.uma.jmetal.problem.impl.AbstractBinaryProblem;
 import org.uma.jmetal.solution.BinarySolution;
 
-import pl.agh.edu.muvto.model.MuvtoGraph;
+import pl.edu.agh.muvto.model.MuvtoGraph;
 
 /**
  * Muvto problem.
@@ -26,6 +26,7 @@ public class MuvtoProblem extends AbstractBinaryProblem {
     @Override
     public void evaluate(BinarySolution solution) {
         // TODO: evaluate solution and set objective
+        solution.setObjective(0, 1.0);
     }
 
     @Override

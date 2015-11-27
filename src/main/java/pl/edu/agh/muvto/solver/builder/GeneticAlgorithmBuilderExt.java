@@ -1,4 +1,4 @@
-package pl.agh.edu.muvto.solver.builder;
+package pl.edu.agh.muvto.solver.builder;
 
 import org.uma.jmetal.algorithm.singleobjective.geneticalgorithm.GeneticAlgorithmBuilder;
 import org.uma.jmetal.operator.CrossoverOperator;

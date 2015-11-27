@@ -1,4 +1,4 @@
-package pl.agh.edu.muvto.solver;
+package pl.edu.agh.muvto.solver;
 
 import org.uma.jmetal.problem.BinaryProblem;
 import org.uma.jmetal.solution.impl.DefaultBinarySolution;

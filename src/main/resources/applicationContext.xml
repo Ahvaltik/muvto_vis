@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/aop
+                           http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+                           http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+                           http://www.springframework.org/schema/context
+                           http://www.springframework.org/schema/context/spring-context-4.2.xsd">
+
+    <context:annotation-config /> 
+    <context:component-scan base-package="pl.edu.agh" />
+
+    <bean id="main"
+          class="pl.edu.agh.muvto.Main"
+          scope="singleton" />
+
+    <bean id="crossoverOperator"
+          class="org.uma.jmetal.operator.impl.crossover.SinglePointCrossover">
+        <constructor-arg value="0.9" />
+    </bean>
+
+    <bean id="mutationOperator"
+          class="org.uma.jmetal.operator.impl.mutation.BitFlipMutation">
+        <constructor-arg value="0.25" />
+    </bean>
+
+    <bean id="selectionOperator"
+          class="org.uma.jmetal.operator.impl.selection.BinaryTournamentSelection">
+    </bean>
+
+    <bean id="geneticAlgorithmBuilder"
+          class="pl.edu.agh.muvto.solver.builder.GeneticAlgorithmBuilderExt">
+        <constructor-arg name="crossoverOperator" ref="crossoverOperator" />
+        <constructor-arg name="mutationOperator" ref="mutationOperator" />
+        <property name="populationSize" value="100" />
+        <property name="maxEvaluations" value="25000" />
+        <property name="selectionOperator" ref="selectionOperator" />
+    </bean>
+
+    <bean id="solver"
+          class="pl.edu.agh.muvto.solver.MuvtoSolver">
+        <constructor-arg ref="geneticAlgorithmBuilder"></constructor-arg>
+    </bean>
+
+<!--
+
+        GeneticAlgorithmBuilderExt<BinarySolution> builder =
+                (GeneticAlgorithmBuilderExt<BinarySolution>)
+                new GeneticAlgorithmBuilderExt<>(
+                        crossoverOperator,
+                        mutationOperator)
+                .setPopulationSize(100)
+                .setMaxEvaluations(25000)
+                .setSelectionOperator(selectionOperator);
+
+        MuvtoSolver solver = new MuvtoSolver(builder);
+    <bean class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close" id="dataSource">
+        <property name="driverClassName" value="${database.driverClassName}"/>
+        <property name="url" value="${database.url}"/>
+        <property name="username" value="${database.username}"/>
+        <property name="password" value="${database.password}"/>
+        <property name="testOnBorrow" value="true"/>
+        <property name="testOnReturn" value="true"/>
+        <property name="testWhileIdle" value="true"/>
+        <property name="timeBetweenEvictionRunsMillis" value="1800000"/>
+        <property name="numTestsPerEvictionRun" value="3"/>
+        <property name="minEvictableIdleTimeMillis" value="1800000"/>
+        <property name="validationQuery" value="SELECT 1"/>
+    </bean>
+-->
+</beans>

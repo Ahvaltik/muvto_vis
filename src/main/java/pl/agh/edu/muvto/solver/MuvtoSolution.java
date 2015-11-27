@@ -4,7 +4,7 @@ import org.uma.jmetal.problem.BinaryProblem;
 import org.uma.jmetal.solution.impl.DefaultBinarySolution;
 
 /**
- * Muvto solution.
+ * Muvto solution. Currently does nothing.
  */
 public class MuvtoSolution extends DefaultBinarySolution {
 

@@ -3,9 +3,19 @@ package pl.agh.edu.muvto;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.uma.jmetal.operator.CrossoverOperator;
+import org.uma.jmetal.operator.MutationOperator;
+import org.uma.jmetal.operator.SelectionOperator;
+import org.uma.jmetal.operator.impl.crossover.SinglePointCrossover;
+import org.uma.jmetal.operator.impl.mutation.BitFlipMutation;
+import org.uma.jmetal.operator.impl.selection.BinaryTournamentSelection;
+import org.uma.jmetal.problem.BinaryProblem;
+import org.uma.jmetal.problem.singleobjective.OneMax;
+import org.uma.jmetal.solution.BinarySolution;
 
 import fj.P;
 import fj.Try;
@@ -14,20 +24,48 @@ import fj.data.Stream;
 import pl.agh.edu.muvto.model.MuvtoEdge;
 import pl.agh.edu.muvto.model.MuvtoGraph;
 import pl.agh.edu.muvto.model.MuvtoVertex;
+import pl.agh.edu.muvto.solver.MuvtoSolver;
+import pl.agh.edu.muvto.solver.builder.GeneticAlgorithmBuilderExt;
 
 /**
  * Main class.
  */
-public class Main
-{
+public class Main {
+
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     /**
      * Application entry point.
      * @param args
      */
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) {
+
+        BinaryProblem problem = new OneMax(512) ;
+
+        CrossoverOperator<BinarySolution> crossoverOperator =
+                new SinglePointCrossover(0.9);
+
+        MutationOperator<BinarySolution> mutationOperator =
+                new BitFlipMutation(1.0 / problem.getNumberOfBits(0));
+
+        SelectionOperator<List<BinarySolution>, BinarySolution>
+            selectionOperator =
+                new BinaryTournamentSelection<BinarySolution>();
+
+        GeneticAlgorithmBuilderExt<BinarySolution> builder =
+                (GeneticAlgorithmBuilderExt<BinarySolution>)
+                new GeneticAlgorithmBuilderExt<>(
+                        crossoverOperator,
+                        mutationOperator)
+                .setPopulationSize(100)
+                .setMaxEvaluations(25000)
+                .setSelectionOperator(selectionOperator);
+
+        MuvtoSolver solver = new MuvtoSolver(builder);
+
+        @SuppressWarnings("unused")
+        BinarySolution solution = solver.solve(problem);
+
         loadGraph("test-graph-01.txt")
             .bimap(Util.liftVoid(Exception::printStackTrace),
                    Util.liftVoid(graph -> logger.info(graph.toString())));

@@ -65,6 +65,12 @@
       <version>${jmetal.version}</version>
     </dependency>
 
+    <dependency>
+      <groupId>org.uma.jmetal</groupId>
+      <artifactId>jmetal-algorithm</artifactId>
+      <version>${jmetal.version}</version>
+    </dependency>
+
     <!-- <dependency>
       <groupId>org.neuroph</groupId>
       <artifactId>neuroph-core</artifactId>

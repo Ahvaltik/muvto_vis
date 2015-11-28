@@ -48,11 +48,6 @@ public class Main {
 
     private void start(String[] args) {
 
-//        BinaryProblem problem = new OneMax(512) ;
-
-//        @SuppressWarnings("unused")
-//        BinarySolution solution = solver.solve(problem);
-
         loadGraph("test-graph-01.txt")
             .bimap(Util.liftVoid(Exception::printStackTrace),
                    Util.liftVoid(graph -> {

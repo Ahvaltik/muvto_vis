@@ -13,10 +13,6 @@
     <context:annotation-config /> 
     <context:component-scan base-package="pl.edu.agh" />
 
-    <bean id="main"
-          class="pl.edu.agh.muvto.Main"
-          scope="singleton" />
-
     <bean id="crossoverOperator"
           class="org.uma.jmetal.operator.impl.crossover.SinglePointCrossover">
         <constructor-arg value="0.9" />

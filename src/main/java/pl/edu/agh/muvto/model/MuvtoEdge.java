@@ -27,7 +27,7 @@ public class MuvtoEdge extends EntityWithId {
     }
 
     public double getWeight() {
-        return getFill()/getCapacity();
+        return getFill()/(double)getCapacity();
     }
     
     public double getAttractiveness() {

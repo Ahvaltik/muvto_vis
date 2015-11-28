@@ -55,7 +55,6 @@ public class Main {
                        logger.debug("graph: "+ graph);
 
                        MuvtoProblem problem = new MuvtoProblem(graph);
-//                       BinaryProblem problem = new OneMax(512) ;
 
                        @SuppressWarnings("unused")
                        BinarySolution solution = solver.solve(problem);

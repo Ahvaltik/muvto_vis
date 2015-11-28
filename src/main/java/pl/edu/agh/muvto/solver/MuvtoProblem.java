@@ -10,6 +10,10 @@ import org.slf4j.LoggerFactory;
 import org.uma.jmetal.problem.impl.AbstractBinaryProblem;
 import org.uma.jmetal.solution.BinarySolution;
 
+import fj.P;
+import fj.P2;
+import fj.data.Stream;
+import fj.data.TreeMap;
 import pl.edu.agh.muvto.model.MuvtoEdge;
 import pl.edu.agh.muvto.model.MuvtoGraph;
 
@@ -37,13 +41,16 @@ public class MuvtoProblem extends AbstractBinaryProblem {
     @Override
     public void evaluate(BinarySolution solution) {
 
+        int maxTransfer = 10;
+
         double meanWeight = graph.edgeSet().parallelStream()
                 .mapToDouble(MuvtoEdge::getWeight)
                 .sum() / graph.edgeSet().size();
 
-        Collection<MuvtoEdge> updatedEdges = graph.vertexSet()
-                .parallelStream()
-                .map(vertex -> {
+        /** Maps edge index to fill delta */
+        TreeMap<Integer, Integer> edgeDelta = Stream
+                .stream(graph.vertexSet())
+                .bind(vertex -> {
 
                     BitSet setup = solution.getVariableValue(vertex.getId());
 
@@ -57,20 +64,63 @@ public class MuvtoProblem extends AbstractBinaryProblem {
                         .sorted(Comparator.comparing(MuvtoEdge::getId))
                         .collect(Collectors.toList());
 
-                    int toTransfer = 10;
+                    int outDegree = graph.outDegreeOf(vertex);
 
-                    // TODO transfer cars (reduce will work here, not map)
+                    double outAttractiveness = graph.outgoingEdgesOf(vertex)
+                            .stream().mapToDouble(MuvtoEdge::getAttractiveness)
+                            .sum();
 
-                    return input.iterator().next(); // dummy value
+                    return Stream.stream(input).zipIndex()
+                        .bind(inputEntry -> {
+
+                            MuvtoEdge inEdge = inputEntry._1();
+                            int inIndex = inputEntry._2();
+
+                            int toTransfer = Math.max(inEdge.getFill(),
+                                                      maxTransfer);
+
+                            return Stream.stream(output).zipIndex()
+                                    .filter(outputEntry -> {
+                                        int outIndex = outputEntry._2();
+                                        int bitIndex
+                                            = inIndex*outDegree + outIndex;
+                                        return setup.get(bitIndex);
+                                    })
+                                    .bind(outputEntry -> {
+
+                                        MuvtoEdge outEdge = outputEntry._1();
+                                        double factor
+                                            = outEdge.getAttractiveness()
+                                                / outAttractiveness;
+
+                                        int delta = (int)(factor*toTransfer);
+
+                                        @SuppressWarnings("unchecked")
+                                        Stream<P2<MuvtoEdge, Integer>> result
+                                            = Stream.stream(
+                                                    P.p(outEdge, delta),
+                                                    P.p(inEdge, -delta));
+
+                                        return result;
+                                    });
+                        });
                 })
-                .collect(Collectors.toList());
+                .toList()
+                .groupBy(entry -> entry._1().getId())
+                .map(deltas -> deltas.map(P2::_2).foldLeft((x,y) -> x+y, 0));
+        
+        logger.debug("delta map: " + edgeDelta);
 
         double meanDeviation = Math.sqrt(
-                updatedEdges.parallelStream()
-                    .mapToDouble(MuvtoEdge::getWeight)
-                    .map(w -> (w-meanWeight)*(w-meanWeight))
-                    .sum() / (graph.edgeSet().size())
-                );
+            graph.edgeSet().stream()
+                .mapToDouble(edge ->
+                    edgeDelta.get(edge.getId())
+                        .map(delta -> delta + edge.getFill())
+                        .orSome(edge::getFill) / (double) edge.getCapacity()
+                )
+                .map(w -> (w-meanWeight)*(w-meanWeight))
+                .sum() / (double) (graph.edgeSet().size())
+        );
 
         logger.debug("objective: " + meanDeviation);
 

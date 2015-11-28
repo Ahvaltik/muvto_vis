@@ -56,10 +56,10 @@ public class Main {
 
                        MuvtoProblem problem = new MuvtoProblem(graph);
 //                       BinaryProblem problem = new OneMax(512) ;
-                       
+
                        @SuppressWarnings("unused")
                        BinarySolution solution = solver.solve(problem);
-                       
+
                        logger.debug("done");
                    }));
     }

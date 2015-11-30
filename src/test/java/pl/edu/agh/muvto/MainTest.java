@@ -1,8 +1,9 @@
-package pl.agh.edu.muvto;
+package pl.edu.agh.muvto;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import pl.edu.agh.muvto.Main;
 
 /**
  * Unit test for simple app.

@@ -21,6 +21,7 @@ import pl.edu.agh.muvto.model.MuvtoGraph;
 import pl.edu.agh.muvto.model.MuvtoVertex;
 import pl.edu.agh.muvto.solver.MuvtoProblem;
 import pl.edu.agh.muvto.solver.MuvtoSolver;
+import pl.edu.agh.muvto.visualisation.Visualiser;
 
 /**
  * Main class.
@@ -53,7 +54,8 @@ public class Main {
                    Util.liftVoid(graph -> {
 
                        logger.debug("graph: "+ graph);
-
+                       Visualiser visualiser = new Visualiser(graph);
+                       visualiser.start();
                        MuvtoProblem problem = new MuvtoProblem(graph);
 
                        @SuppressWarnings("unused")

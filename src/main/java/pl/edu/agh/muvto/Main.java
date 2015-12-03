@@ -1,5 +1,6 @@
 package pl.edu.agh.muvto;
 
+import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -19,6 +20,7 @@ import fj.data.Stream;
 import pl.edu.agh.muvto.model.MuvtoEdge;
 import pl.edu.agh.muvto.model.MuvtoGraph;
 import pl.edu.agh.muvto.model.MuvtoVertex;
+import pl.edu.agh.muvto.predictor.MuvtoPredictor;
 import pl.edu.agh.muvto.solver.MuvtoProblem;
 import pl.edu.agh.muvto.solver.MuvtoSolver;
 
@@ -35,12 +37,28 @@ public class Main {
      * @param args
      */
     public static void main(String[] args) {
-
-        @SuppressWarnings("resource")
+      
+        /*@SuppressWarnings("resource")
         ApplicationContext context = 
                 new ClassPathXmlApplicationContext("applicationContext.xml");
 
-        (context.getBean(Main.class)).start(args);
+        (context.getBean(Main.class)).start(args);*/
+        
+        
+        /* PREDICTION SAMPLE */
+        MuvtoPredictor pred = new MuvtoPredictor(0);
+        
+        try {
+          pred.updateData(0.0);
+          pred.updateData(2.0);
+          pred.updateData(3.0);
+  
+        } catch (IOException e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+        }
+      
+        pred.predict(2.0);
     }
 
     @Autowired

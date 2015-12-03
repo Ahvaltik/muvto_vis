@@ -34,7 +34,7 @@ class PythonPredictor(object):
         return dataSet
 
     def read_data_from_file(self):
-        with open ("src/main/java/pl/edu/agh/muvto/predictor/prediction_data/data_"+self.id+".csv", "r") as myfile:
+        with open ("src/main/resources/predictor/prediction_data/data_"+self.id+".csv", "r") as myfile:
             file_data=myfile.read().replace('\n', '')
 
         return file_data.split(',')

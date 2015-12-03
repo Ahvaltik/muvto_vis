@@ -56,7 +56,7 @@ public class MuvtoPredictor {
         
         try {
             Process p = Runtime.getRuntime()
-                .exec("python src/main/java/pl/edu/agh/muvto/predictor/prediction.py "
+                .exec("python src/main/resources/predictor/prediction.py "
                           + this.edgeId + " " + this.learningrate + " " + this.momentum
                           + " " + this.epochs + " " + this.testData + " " + value);
              
@@ -84,7 +84,8 @@ public class MuvtoPredictor {
     
     public void writeDataToFile () throws IOException{
         BufferedWriter outputWriter = null;
-        outputWriter = new BufferedWriter(new FileWriter("src/main/java/pl/edu/agh/muvto/predictor/prediction_data/data_"+this.edgeId+".csv"));
+        outputWriter = new BufferedWriter(
+            new FileWriter("src/main/resources/predictor/prediction_data/data_" + this.edgeId + ".csv"));
         
         for (int i = 0; i < this.data.size(); i++) {
             outputWriter.write(this.data.get(i)+",");

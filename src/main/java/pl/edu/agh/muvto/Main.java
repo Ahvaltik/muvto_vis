@@ -3,6 +3,7 @@ package pl.edu.agh.muvto;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.slf4j.Logger;
@@ -13,6 +14,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Component;
 import org.uma.jmetal.solution.BinarySolution;
 
+import fj.F2;
 import fj.P;
 import fj.Try;
 import fj.data.Either;
@@ -20,8 +22,11 @@ import fj.data.Stream;
 import pl.edu.agh.muvto.model.MuvtoEdge;
 import pl.edu.agh.muvto.model.MuvtoGraph;
 import pl.edu.agh.muvto.model.MuvtoVertex;
+import pl.edu.agh.muvto.solver.GraphTransformer;
 import pl.edu.agh.muvto.solver.MuvtoProblem;
 import pl.edu.agh.muvto.solver.MuvtoSolver;
+import pl.edu.agh.muvto.util.Holder;
+import pl.edu.agh.muvto.util.Util;
 
 /**
  * Main class.
@@ -47,26 +52,44 @@ public class Main {
     @Autowired
     private MuvtoSolver solver;
 
+    @Autowired
+    private GraphTransformer transformer;
+
     private void start(String[] args) {
 
         loadGraph("test-graph-01.txt")
             .bimap(Util.liftVoid(Exception::printStackTrace),
-                   Util.liftVoid(graph -> {
+                   Util.liftVoid(initialGraph -> {
 
-                       logger.debug("graph: "+ graph);
+                       logger.debug("graph: " + initialGraph);
 
-                       MuvtoProblem problem = new MuvtoProblem(graph);
+                       Holder<F2<MuvtoGraph, Integer, MuvtoGraph>> step
+                           = new Holder<>();
 
-                       BinarySolution solution = solver.solve(problem);
+                       step.f = (graph, i) -> {
 
-                       problem.evaluate(solution);
-                       double objective = solution.getObjective(0);
+                           logger.debug("fill: " + graph.edgeSet()
+                               .stream().map(MuvtoEdge::getFill)
+                               .collect(Collectors.toList()));
 
-                       logger.debug("solution objective: " + objective);
+                           MuvtoProblem problem = new MuvtoProblem(graph);
+                           BinarySolution solution = solver.solve(problem);
 
-                       IntStream.range(0, solution.getNumberOfVariables())
-                           .mapToObj(solution::getVariableValueString)
-                           .forEach(logger::debug);
+                           logger.debug("setup: " + IntStream
+                                   .range(0, solution.getNumberOfVariables())
+                                   .mapToObj(solution::getVariableValueString)
+                                   .collect(Collectors.joining()));
+
+                           double objective = solution.getObjective(0);
+                           logger.debug("objective: " + objective);
+
+                           MuvtoGraph newGraph = transformer.graphFlow(graph,
+                                                                       solution,
+                                                                       10);
+                           return (i > 0) ? step.f.f(newGraph, i-1) : newGraph;
+                       };
+
+                       step.f.f(initialGraph, 10);
 
                        logger.debug("done");
                    }));

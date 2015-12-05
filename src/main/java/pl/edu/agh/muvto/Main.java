@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +59,8 @@ public class Main {
           e.printStackTrace();
         }
       
-        pred.predict(2.0);
+        System.out.println(pred.predict(2.0));
+        System.out.println(Arrays.toString(pred.predict(2.0, 3)));
     }
 
     @Autowired

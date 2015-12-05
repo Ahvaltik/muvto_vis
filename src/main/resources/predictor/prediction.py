@@ -50,9 +50,12 @@ class PythonPredictor(object):
 
         return t
 
-    def predict(self, val):
-        return (self.network.activate([val]))[0]
-
+    def predict(self, val, steps):
+    	result = val
+    	for step in range(0, int(steps)):
+    		#print("PREDICTING... " + str(result))
+    		result = (self.network.activate([result]))[0]
+    		print(result)
 
     def test(self, trained):
         """
@@ -72,16 +75,15 @@ class PythonPredictor(object):
         trained.testOnData(testdata, verbose= self.test_verbose)
 
 
-if len(sys.argv) < 7:
-    print("Arguments missed. Use: python prediction.py edge_id learningrate momentum epochs_amount if_test_data value_to_predict")
+if len(sys.argv) < 8:
+    print("Arguments missed. Use: python prediction.py edge_id learningrate momentum epochs_amount if_test_data value_to_predict steps")
     exit(-1)
 
 
 predictor = PythonPredictor(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
 predictor.test(predictor.train(predictor.make_dataset()))
 
-
-print(predictor.predict(sys.argv[6]))
+predictor.predict(sys.argv[6], sys.argv[7])
 
 
 

@@ -5,6 +5,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -50,15 +51,20 @@ public class MuvtoPredictor {
         writeDataToFile();
     }
     
-    public void predict(Double value){
+    public Double predict(Double value){
+        return predict(value, 1)[0];
+    }
+    
+    public Double[] predict(Double value, int steps){
         
         String s = null;
+        Double[] result = new Double[steps];
         
         try {
             Process p = Runtime.getRuntime()
                 .exec("python src/main/resources/predictor/prediction.py "
                           + this.edgeId + " " + this.learningrate + " " + this.momentum
-                          + " " + this.epochs + " " + this.testData + " " + value);
+                          + " " + this.epochs + " " + this.testData + " " + value + " " + steps);
              
             BufferedReader stdInput = new BufferedReader(new
                  InputStreamReader(p.getInputStream()));
@@ -66,20 +72,23 @@ public class MuvtoPredictor {
             BufferedReader stdError = new BufferedReader(new
                  InputStreamReader(p.getErrorStream()));
  
-            System.out.println("Here is the standard output of the command:\n");
+            int iterator = 0;
             while ((s = stdInput.readLine()) != null) {
-                System.out.println(s);
+                //System.out.println(s);
+                result[iterator] = new Double(s);
+                iterator++;
             }
             
-            System.out.println("Here is the standard error of the command (if any):\n");
             while ((s = stdError.readLine()) != null) {
-                System.out.println(s);
+                logger.error(s);
             }
         }
         catch (IOException e) {
             System.out.println("exception happened: ");
             e.printStackTrace();
         }
+        
+        return result;
     }
     
     public void writeDataToFile () throws IOException{

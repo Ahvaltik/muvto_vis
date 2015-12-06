@@ -9,6 +9,7 @@ import java.util.stream.IntStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Component;
@@ -55,6 +56,9 @@ public class Main {
     @Autowired
     private GraphTransformer transformer;
 
+    @Value("${muvto.solver.maxTransfer}")
+    private int maxTransfer;
+
     private void start(String[] args) {
 
         loadGraph("test-graph-01.txt")
@@ -72,7 +76,8 @@ public class Main {
                                .stream().map(MuvtoEdge::getFill)
                                .collect(Collectors.toList()));
 
-                           MuvtoProblem problem = new MuvtoProblem(graph);
+                           MuvtoProblem problem =new MuvtoProblem(graph,
+                                                                  maxTransfer);
                            BinarySolution solution = solver.solve(problem);
 
                            logger.debug("setup: " + IntStream
@@ -83,13 +88,15 @@ public class Main {
                            double objective = solution.getObjective(0);
                            logger.debug("objective: " + objective);
 
-                           MuvtoGraph newGraph = transformer.graphFlow(graph,
-                                                                       solution,
-                                                                       10);
+                           MuvtoGraph newGraph =
+                                   transformer.graphFlow(graph,
+                                                         solution,
+                                                         maxTransfer);
                            return (i > 0) ? step.f.f(newGraph, i-1) : newGraph;
                        };
 
-                       step.f.f(initialGraph, 10);
+                       final int steps = 10;
+                       step.f.f(initialGraph, steps);
 
                        logger.debug("done");
                    }));

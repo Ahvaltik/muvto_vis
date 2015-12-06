@@ -20,10 +20,12 @@ public class MuvtoProblem extends AbstractBinaryProblem {
         = LoggerFactory.getLogger(MuvtoProblem.class);
 
     private MuvtoGraph graph;
+    private int maxTransfer;
 
-    public MuvtoProblem(MuvtoGraph graph) {
+    public MuvtoProblem(MuvtoGraph graph, int maxTransfer) {
 
         this.graph = graph;
+        this.maxTransfer = maxTransfer;
 
         setNumberOfVariables(graph.vertexSet().size());
         setNumberOfObjectives(1);
@@ -36,8 +38,6 @@ public class MuvtoProblem extends AbstractBinaryProblem {
         double meanWeight = graph.edgeSet().parallelStream()
                 .mapToDouble(MuvtoEdge::getWeight)
                 .sum() / graph.edgeSet().size();
-
-        int maxTransfer = 10;
 
         TreeMap<Integer, Integer> edgeDelta = new GraphTransformer()
             .calculateEdgeDelta(graph, solution, maxTransfer);

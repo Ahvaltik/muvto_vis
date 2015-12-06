@@ -13,6 +13,11 @@
     <context:annotation-config /> 
     <context:component-scan base-package="pl.edu.agh" />
 
+     <bean id="muvtoProperties"
+           class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="location" value="classpath:muvto.properties" />
+     </bean>
+
     <bean id="crossoverOperator"
           class="org.uma.jmetal.operator.impl.crossover.SinglePointCrossover">
         <constructor-arg value="0.9" />

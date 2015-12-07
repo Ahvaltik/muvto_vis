@@ -39,13 +39,16 @@ public class Main {
      */
     public static void main(String[] args) {
       
-        /*@SuppressWarnings("resource")
+        @SuppressWarnings("resource")
         ApplicationContext context = 
                 new ClassPathXmlApplicationContext("applicationContext.xml");
 
-        (context.getBean(Main.class)).start(args);*/
+        (context.getBean(Main.class)).start(args);
         
-        
+        runPredictorSample();
+    }
+    
+    private static void runPredictorSample(){
         /* PREDICTION SAMPLE */
         MuvtoPredictor pred = new MuvtoPredictor(0);
         

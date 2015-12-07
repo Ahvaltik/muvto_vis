@@ -56,34 +56,48 @@ public class MuvtoPredictor {
     
     public Double[] predict(Double value, int steps){
         
-        String s = null;
         Double[] result = new Double[steps];
-        
-        try {
-            Process p = Runtime.getRuntime()
-                .exec("python src/main/resources/predictor/prediction.py "
-                          + this.edgeId + " " + this.learningrate + " " + this.momentum
-                          + " " + this.epochs + " " + this.testData + " " + value + " " + steps);
-             
-            BufferedReader stdInput = new BufferedReader(new
-                 InputStreamReader(p.getInputStream()));
- 
-            BufferedReader stdError = new BufferedReader(new
-                 InputStreamReader(p.getErrorStream()));
- 
-            int iterator = 0;
-            while ((s = stdInput.readLine()) != null) {
-                //System.out.println(s);
-                result[iterator] = new Double(s);
-                iterator++;
-            }
+      
+        try{
+            String s = null;
+            InputStreamReader inputStream = null;
+            BufferedReader stdInput = null;
+            InputStreamReader errorStream = null;
+            BufferedReader stdError = null;
             
-            while ((s = stdError.readLine()) != null) {
-                logger.error(s);
+            try {
+                Process p = Runtime.getRuntime()
+                    .exec("python src/main/resources/predictor/prediction.py "
+                              + this.edgeId + " " + this.learningrate + " " + this.momentum
+                              + " " + this.epochs + " " + this.testData + " " + value + " " + steps);
+                 
+                inputStream = new InputStreamReader(p.getInputStream());
+                stdInput = new BufferedReader(inputStream);
+     
+                errorStream = new InputStreamReader(p.getErrorStream());
+                stdError = new BufferedReader(errorStream);
+     
+                int iterator = 0;
+                while ((s = stdInput.readLine()) != null) {
+                    //System.out.println(s);
+                    result[iterator] = new Double(s);
+                    iterator++;
+                }
+                
+                while ((s = stdError.readLine()) != null) {
+                    logger.error(s);
+                }
             }
-        }
-        catch (IOException e) {
-            System.out.println("exception happened: ");
+            catch (IOException e) {
+                System.out.println("exception happened: ");
+                e.printStackTrace();
+            }finally {
+                inputStream.close();
+                stdInput.close();
+                errorStream.close();
+                stdError.close();
+            }
+        }catch (IOException e) {
             e.printStackTrace();
         }
         

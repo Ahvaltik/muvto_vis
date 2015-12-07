@@ -2,6 +2,7 @@ package pl.edu.agh.muvto.predictor;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -28,11 +29,17 @@ public class MuvtoPredictor {
 
     public MuvtoPredictor(int N, int edgeId, double learningrate, double momentum, int epochs, Boolean testData){
         this.data = new NLengthList(N);
-        this.pathToFile = "src/main/tmp/prediction_data/data_" + edgeId + ".csv";
         this.learningrate = learningrate;
         this.momentum = momentum;
         this.epochs = epochs;
         this.testData = testData;
+        
+        try {
+            this.pathToFile = File.createTempFile("data_" + edgeId, ".csv").getAbsolutePath();
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+            e.printStackTrace();
+        }
     }
     
     public MuvtoPredictor(int edgeId){

@@ -74,15 +74,16 @@ class PythonPredictor(object):
         trained.testOnData(testdata, verbose= self.test_verbose)
 
 
-if len(sys.argv) < 8:
-    print("Arguments missed. Use: python prediction.py path_to_file learningrate momentum epochs_amount if_test_data value_to_predict steps")
-    exit(-1)
+if __name__ == '__main__':
+    if len(sys.argv) < 8:
+        print("Arguments missed. Use: python prediction.py path_to_file learningrate momentum epochs_amount if_test_data value_to_predict steps")
+        exit(-1)
 
 
-predictor = PythonPredictor(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
-predictor.test(predictor.train(predictor.make_dataset()))
+    predictor = PythonPredictor(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
+    predictor.test(predictor.train(predictor.make_dataset()))
 
-predictor.predict(sys.argv[6], sys.argv[7])
+    predictor.predict(sys.argv[6], sys.argv[7])
 
 
 

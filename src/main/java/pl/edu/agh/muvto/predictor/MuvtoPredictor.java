@@ -78,11 +78,7 @@ public class MuvtoPredictor {
                 stdError = new BufferedReader(errorStream);
      
                 int iterator = 0;
-                while ((s = stdInput.readLine()) != null) {
-                    //System.out.println(s);
-                    result[iterator] = new Double(s);
-                    iterator++;
-                }
+                result = stdInput.lines().map(x -> Double.valueOf(x)).toArray(Double[]::new);
                 
                 while ((s = stdError.readLine()) != null) {
                     logger.error(s);

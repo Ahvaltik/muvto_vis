@@ -5,8 +5,8 @@ import sys
 
 
 class PythonPredictor(object):
-    def __init__(self, id, learningrate, momentum, epochs, test_verbose):
-        self.id = id
+    def __init__(self, path, learningrate, momentum, epochs, test_verbose):
+        self.path = path
         self.network = None
         self.learningrate = float(learningrate)
         self.momentum = float(momentum)
@@ -34,7 +34,7 @@ class PythonPredictor(object):
         return dataSet
 
     def read_data_from_file(self):
-        with open ("src/main/tmp/prediction_data/data_"+self.id+".csv", "r") as myfile:
+        with open (self.path, "r") as myfile:
             file_data=myfile.read().replace('\n', '')
 
         return file_data.split(',')
@@ -75,7 +75,7 @@ class PythonPredictor(object):
 
 
 if len(sys.argv) < 8:
-    print("Arguments missed. Use: python prediction.py edge_id learningrate momentum epochs_amount if_test_data value_to_predict steps")
+    print("Arguments missed. Use: python prediction.py path_to_file learningrate momentum epochs_amount if_test_data value_to_predict steps")
     exit(-1)
 
 

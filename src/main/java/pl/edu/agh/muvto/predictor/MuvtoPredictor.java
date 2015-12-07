@@ -20,15 +20,15 @@ public class MuvtoPredictor {
         LoggerFactory.getLogger(MuvtoPredictor.class);
     
     private NLengthList<Double> data;
-    private int edgeId;
     private double learningrate;
     private double momentum;
     private int epochs;
     private Boolean testData;
+    private String pathToFile;
 
     public MuvtoPredictor(int N, int edgeId, double learningrate, double momentum, int epochs, Boolean testData){
         this.data = new NLengthList(N);
-        this.edgeId = edgeId;
+        this.pathToFile = "src/main/tmp/prediction_data/data_" + edgeId + ".csv";
         this.learningrate = learningrate;
         this.momentum = momentum;
         this.epochs = epochs;
@@ -36,12 +36,7 @@ public class MuvtoPredictor {
     }
     
     public MuvtoPredictor(int edgeId){
-        this.data = new NLengthList(1000);
-        this.edgeId = edgeId;
-        this.learningrate = 0.01;
-        this.momentum = 0.99;
-        this.epochs = 1000;
-        this.testData = false;
+        this(1000, edgeId, 0.01, 0.99, 1000, false);
     }
     
     public void updateData(Double sample) throws IOException{
@@ -68,7 +63,7 @@ public class MuvtoPredictor {
             try {
                 Process p = Runtime.getRuntime()
                     .exec("python src/main/resources/prediction.py "
-                              + this.edgeId + " " + this.learningrate + " " + this.momentum
+                              + this.pathToFile + " " + this.learningrate + " " + this.momentum
                               + " " + this.epochs + " " + this.testData + " " + value + " " + steps);
                  
                 inputStream = new InputStreamReader(p.getInputStream());
@@ -103,7 +98,7 @@ public class MuvtoPredictor {
     public void writeDataToFile () throws IOException{
         BufferedWriter outputWriter = null;
         outputWriter = new BufferedWriter(
-            new FileWriter("src/main/tmp/prediction_data/data_" + this.edgeId + ".csv"));
+            new FileWriter(this.pathToFile));
         
         for (int i = 0; i < this.data.size(); i++) {
             outputWriter.write(this.data.get(i)+",");

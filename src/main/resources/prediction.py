@@ -13,9 +13,9 @@ class PythonPredictor(object):
         self.epochs = int(epochs)
         
         if test_verbose == "true":
-        	self.test_verbose = True
-    	else:
-    		self.test_verbose = False
+            self.test_verbose = True
+        else:
+            self.test_verbose = False
 
     def make_dataset(self):
         """
@@ -51,11 +51,10 @@ class PythonPredictor(object):
         return t
 
     def predict(self, val, steps):
-    	result = val
-    	for step in range(0, int(steps)):
-    		#print("PREDICTING... " + str(result))
-    		result = (self.network.activate([result]))[0]
-    		print(result)
+        result = val
+        for step in range(0, int(steps)):
+            result = (self.network.activate([result]))[0]
+            print(result)
 
     def test(self, trained):
         """

@@ -3,6 +3,7 @@ package pl.edu.agh.muvto;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.stream.IntStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,8 +59,16 @@ public class Main {
                        visualiser.start();
                        MuvtoProblem problem = new MuvtoProblem(graph);
 
-                       @SuppressWarnings("unused")
                        BinarySolution solution = solver.solve(problem);
+
+                       problem.evaluate(solution);
+                       double objective = solution.getObjective(0);
+
+                       logger.debug("solution objective: " + objective);
+
+                       IntStream.range(0, solution.getNumberOfVariables())
+                           .mapToObj(solution::getVariableValueString)
+                           .forEach(logger::debug);
 
                        logger.debug("done");
                    }));

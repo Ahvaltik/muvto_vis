@@ -35,8 +35,7 @@ public class MuvtoPredictor {
         this.testData = testData;
     }
     
-    public MuvtoPredictor(int edgeId)
-    {
+    public MuvtoPredictor(int edgeId){
         this.data = new NLengthList(1000);
         this.edgeId = edgeId;
         this.learningrate = 0.01;

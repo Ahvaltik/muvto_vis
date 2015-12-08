@@ -1,88 +1,63 @@
 package pl.edu.agh.muvto.visualisation;
 
-import com.jgraph.layout.JGraphFacade;
-import com.jgraph.layout.graph.JGraphSimpleLayout;
-import org.jgraph.JGraph;
-import org.jgraph.graph.*;
-import org.jgrapht.ext.JGraphModelAdapter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.graphstream.graph.Edge;
+import org.graphstream.graph.Graph;
+import org.graphstream.graph.Node;
+import org.graphstream.graph.implementations.SingleGraph;
+import pl.edu.agh.muvto.model.MuvtoEdge;
 import pl.edu.agh.muvto.model.MuvtoGraph;
+import pl.edu.agh.muvto.model.MuvtoVertex;
 import pl.edu.agh.muvto.solver.MuvtoSolution;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.geom.Rectangle2D;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.Iterator;
 
-public class Visualiser extends JFrame {
-    private static final Logger logger = LoggerFactory.getLogger(Visualiser.class);
+/**
+ * Created by Pawel on 2015-12-06.
+ */
+public class Visualiser{
+    private Graph visualisedGraph;
+    private MuvtoGraph referenceGraph;
+    private HashMap<MuvtoVertex,Node> vertexMap;
+    private HashMap<MuvtoEdge,Edge> edgeMap;
 
-    private final MuvtoGraph mGraph;
-    private JGraphModelAdapter mJgAdapter;
-    private static final Color DEFAULT_BG_COLOR = Color.decode( "#FAFBFF" );
-    private static final Dimension DEFAULT_SIZE = new Dimension( 530, 320 );
+    public Visualiser(MuvtoGraph graph){
+        referenceGraph = graph;
+        visualisedGraph = new SingleGraph("MuvtoGraph");
+        vertexMap = new HashMap<MuvtoVertex, Node>();
+        edgeMap = new HashMap<MuvtoEdge, Edge>();
 
-    public Visualiser(MuvtoGraph graph) {
-        super();
-        mGraph = graph;
+        // Translating vertices to graphstream graph
+        for(MuvtoVertex vertex: graph.vertexSet()){
+            Node node = visualisedGraph.addNode(vertex.toString());
+            node.addAttribute("ui.label", vertex.toString());
+
+            //create map for further edition purposes
+            vertexMap.put(vertex, node);
+        }
+        // Translating edges to graphstream graph
+        for(MuvtoEdge edge: graph.edgeSet()){
+            MuvtoVertex edgeSource = graph.getEdgeSource(edge);
+            MuvtoVertex edgeTarget = graph.getEdgeTarget(edge);
+            Edge visualisedEdge = visualisedGraph.addEdge(edge.toString(), edgeSource.toString(), edgeTarget.toString(), true);
+
+            //create map for further edition purposes
+            edgeMap.put(edge, visualisedEdge);
+        }
     }
 
     public void start() {
-        init();
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        pack();
-        setVisible(true);
-    }
-
-    public void init() {
-        mJgAdapter = new JGraphModelAdapter(mGraph);
-
-        JGraph jgraph = new JGraph(mJgAdapter);
-        adjustDisplaySettings( jgraph );
-        getContentPane(  ).add( jgraph );
-        resize( DEFAULT_SIZE );
-
-        mGraph.vertexSet().stream().forEach(this::resizeVertex);
-        mGraph.edgeSet().stream().forEach(this::resizeEdge);
-
-        JGraphSimpleLayout hir = new JGraphSimpleLayout(JGraphSimpleLayout.TYPE_CIRCLE);
-
-        final JGraphFacade graphFacade = new JGraphFacade(jgraph);
-        hir.run(graphFacade);
-        final Map nestedMap = graphFacade.createNestedMap(true, true);
-        jgraph.getGraphLayoutCache().edit(nestedMap);
+        // Curving edges with same vertices and opposite directions
+        System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
+        Iterator<Edge> edgeIterator = visualisedGraph.getEdgeIterator();
+        while(edgeIterator.hasNext()){
+            Edge e = edgeIterator.next();
+            e.addAttribute("ui.style", "fill-color: rgb(0,100,255);");
+        }
+        visualisedGraph.display();
     }
 
     public void updateGraph(MuvtoSolution solution) {
 
     }
-
-    private void adjustDisplaySettings(JGraph jg) {
-        jg.setPreferredSize(DEFAULT_SIZE);
-        jg.setBackground(DEFAULT_BG_COLOR);
-        jg.setFont(jg.getFont().deriveFont(Font.BOLD));
-    }
-
-    private void resizeVertex(Object vertex) {
-        DefaultGraphCell cell = mJgAdapter.getVertexCell(vertex);
-        Map attr = cell.getAttributes();
-        Rectangle2D bounds = GraphConstants.getBounds(attr);
-        //GraphConstants.setBounds(attr, new Rectangle2D.Double(bounds.getX(), bounds.getY(), 30, 30));
-        GraphConstants.setBackground(attr, Color.green);
-        Map cellAttr = new HashMap();
-        cellAttr.put(cell, attr);
-        mJgAdapter.edit(cellAttr, null, null, null);
-    }
-
-    private void resizeEdge(Object edge) {
-        DefaultGraphCell cell = mJgAdapter.getEdgeCell(edge);
-        Map attr = cell.getAttributes();
-        //GraphConstants.setLineWidth(attr, 0.5f);
-        Map cellAttr = new HashMap();
-        cellAttr.put(cell, attr);
-        //mJgAdapter.edit(cellAttr, null, null, null); //edge factory fails, possibly due to lack of empty constructor for MuvtoEdge
-    }
-
 }

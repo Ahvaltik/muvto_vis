@@ -26,6 +26,7 @@
     <jgrapht.version>0.9.1</jgrapht.version>
     <jmetal.version>5.0</jmetal.version>
     <neuroph.version>2.9</neuroph.version>
+    <lang3.version>3.4</lang3.version>
     <fj.version>4.4</fj.version>
 
   </properties>
@@ -123,6 +124,12 @@
       <groupId>org.functionaljava</groupId>
       <artifactId>functionaljava-java8</artifactId>
       <version>${fj.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>${lang3.version}</version>
     </dependency>
 
   </dependencies>

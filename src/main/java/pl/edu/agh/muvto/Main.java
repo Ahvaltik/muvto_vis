@@ -1,11 +1,12 @@
 package pl.edu.agh.muvto;
 
+import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ import fj.data.Stream;
 import pl.edu.agh.muvto.model.MuvtoEdge;
 import pl.edu.agh.muvto.model.MuvtoGraph;
 import pl.edu.agh.muvto.model.MuvtoVertex;
+import pl.edu.agh.muvto.predictor.MuvtoPredictor;
 import pl.edu.agh.muvto.solver.GraphTransformer;
 import pl.edu.agh.muvto.solver.MuvtoProblem;
 import pl.edu.agh.muvto.solver.MuvtoSolver;
@@ -42,12 +44,32 @@ public class Main {
      * @param args
      */
     public static void main(String[] args) {
-
+      
         @SuppressWarnings("resource")
         ApplicationContext context = 
                 new ClassPathXmlApplicationContext("applicationContext.xml");
 
         (context.getBean(Main.class)).start(args);
+        
+        runPredictorSample();
+    }
+    
+    private static void runPredictorSample(){
+        /* PREDICTION SAMPLE */
+        MuvtoPredictor pred = new MuvtoPredictor(0);
+        
+        try {
+          pred.updateData(0.0);
+          pred.updateData(2.0);
+          pred.updateData(3.0);
+  
+        } catch (IOException e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+        }
+      
+        System.out.println(pred.predict(2.0));
+        System.out.println(Arrays.toString(pred.predict(2.0, 3)));
     }
 
     @Autowired

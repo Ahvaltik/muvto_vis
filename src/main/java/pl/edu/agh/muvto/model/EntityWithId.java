@@ -28,7 +28,7 @@ public class EntityWithId {
             return false;
         }
 
-        if (!(obj instanceof EntityWithId)) {
+        if (!this.getClass().equals(obj.getClass())) {
             return false;
         }
 

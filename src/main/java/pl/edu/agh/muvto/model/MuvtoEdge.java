@@ -4,13 +4,23 @@ public class MuvtoEdge extends EntityWithId {
 
     private int capacity;
     private int fill;
-    private double attractiveness;
+    private double baseAttractiveness;
 
-    public MuvtoEdge(int id, int capacity, int fill, double attractiveness) {
+    public MuvtoEdge(int id,
+                     int capacity,
+                     int fill,
+                     double baseAttractiveness) {
         super(id);
         this.capacity = capacity;
         this.fill = fill;
-        this.attractiveness = attractiveness;
+        this.baseAttractiveness = baseAttractiveness;
+    }
+
+    public MuvtoEdge withFill(int fill) {
+        return new MuvtoEdge(getId(),
+                             getCapacity(),
+                             fill,
+                             getBaseAttractiveness());
     }
 
     @Override
@@ -29,8 +39,12 @@ public class MuvtoEdge extends EntityWithId {
     public double getWeight() {
         return getFill()/(double)getCapacity();
     }
-    
-    public double getAttractiveness() {
-        return attractiveness;
+
+    public double getBaseAttractiveness() {
+        return baseAttractiveness;
+    }
+
+    public double getEffectiveAttractiveness() {
+        return (1 + 0.5 * getWeight()) * getBaseAttractiveness();
     }
 }

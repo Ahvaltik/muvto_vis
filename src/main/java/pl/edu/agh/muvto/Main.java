@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,7 @@ import pl.edu.agh.muvto.predictor.MuvtoPredictor;
 import pl.edu.agh.muvto.solver.GraphTransformer;
 import pl.edu.agh.muvto.solver.MuvtoProblem;
 import pl.edu.agh.muvto.solver.MuvtoSolver;
+import pl.edu.agh.muvto.solver.MuvtoSolverProvider;
 import pl.edu.agh.muvto.util.Holder;
 import pl.edu.agh.muvto.util.Util;
 
@@ -51,7 +53,7 @@ public class Main {
 
         (context.getBean(Main.class)).start(args);
         
-        runPredictorSample();
+        //runPredictorSample();
     }
     
     private static void runPredictorSample(){
@@ -73,7 +75,7 @@ public class Main {
     }
 
     @Autowired
-    private MuvtoSolver solver;
+    MuvtoSolverProvider solverProvider;
 
     @Autowired
     private GraphTransformer transformer;
@@ -100,7 +102,7 @@ public class Main {
 
                            MuvtoProblem problem =new MuvtoProblem(graph,
                                                                   maxTransfer);
-                           BinarySolution solution = solver.solve(problem);
+                           BinarySolution solution = solverProvider.getSolution(problem, 10);
 
                            logger.debug("setup: " + IntStream
                                    .range(0, solution.getNumberOfVariables())
@@ -114,6 +116,7 @@ public class Main {
                                    transformer.graphFlow(graph,
                                                          solution,
                                                          maxTransfer);
+                           logger.debug("difference: " + problem.distance(new MuvtoProblem(newGraph, maxTransfer)));
                            return (i > 0) ? step.f.f(newGraph, i-1) : newGraph;
                        };
 

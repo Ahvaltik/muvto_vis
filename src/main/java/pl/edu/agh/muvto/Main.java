@@ -25,6 +25,7 @@ import fj.data.Stream;
 import pl.edu.agh.muvto.model.MuvtoEdge;
 import pl.edu.agh.muvto.model.MuvtoGraph;
 import pl.edu.agh.muvto.model.MuvtoVertex;
+import pl.edu.agh.muvto.predictor.GraphPredictor;
 import pl.edu.agh.muvto.predictor.MuvtoPredictor;
 import pl.edu.agh.muvto.solver.GraphTransformer;
 import pl.edu.agh.muvto.solver.MuvtoProblem;
@@ -94,6 +95,8 @@ public class Main {
                        Holder<F2<MuvtoGraph, Integer, MuvtoGraph>> step
                            = new Holder<>();
 
+                       GraphPredictor predictor = new GraphPredictor(initialGraph, maxTransfer);
+
                        step.f = (graph, i) -> {
 
                            logger.debug("fill: " + graph.edgeSet()
@@ -116,7 +119,9 @@ public class Main {
                                    transformer.graphFlow(graph,
                                                          solution,
                                                          maxTransfer);
+
                            logger.debug("difference: " + problem.distance(new MuvtoProblem(newGraph, maxTransfer)));
+
                            return (i > 0) ? step.f.f(newGraph, i-1) : newGraph;
                        };
 

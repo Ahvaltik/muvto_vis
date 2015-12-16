@@ -19,6 +19,17 @@ public class Visualiser{
         mapping = new GraphMapping(graph);
         referenceGraph = graph;
         visualisedGraph = mapping.getGraph();
+        visualisedGraph.addAttribute("ui.stylesheet", "" +
+                "edge {" +
+                //"shape: blob;" +
+                //"size: 3px;" +
+                "fill-mode: dyn-plain;" +
+                "fill-color: green, red;" +
+                //"arrow-shape: none;" +
+                "}" +
+                "node {" +
+                //"size: 20px;" +
+                "}");
 
         // Translating vertices to graphstream graph
         for(MuvtoVertex vertex: graph.vertexSet()){
@@ -34,16 +45,22 @@ public class Visualiser{
 
     public void start() {
         // Curving edges with same vertices and opposite directions
-        //System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
-        for(MuvtoEdge muvtoEdge: referenceGraph.edgeSet()){
-            Edge e = mapping.getEdge(muvtoEdge);
-            e.addAttribute("ui.style", "fill-color: rgb(0,255,0), rgb(255,0,0);");
-            e.addAttribute("ui.color", Double.toString(muvtoEdge.getWeight()));
-        }
+        //System.setProperty("gs.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
+        updateColor();
         visualisedGraph.display();
     }
 
-    public void updateGraph(MuvtoSolution solution) {
+    public void updateGraph(MuvtoGraph graph, MuvtoSolution solution) {
+        //todo jednostopniowe update.. może być ta funkcja
+        mapping.updateGraph(graph);
+        referenceGraph = graph;
+        updateColor();
+    }
 
+    private void updateColor() {
+        for(MuvtoEdge muvtoEdge: referenceGraph.edgeSet()){
+            Edge e = mapping.getEdge(muvtoEdge);
+            e.addAttribute("ui.color", muvtoEdge.getWeight());
+        }
     }
 }

@@ -21,14 +21,20 @@ public class Visualiser{
         visualisedGraph = mapping.getGraph();
         visualisedGraph.addAttribute("ui.stylesheet", "" +
                 "edge {" +
-                //"shape: blob;" +
-                //"size: 3px;" +
+                "shape: blob;" +
+                "size: 3px;" +
                 "fill-mode: dyn-plain;" +
                 "fill-color: green, red;" +
-                //"arrow-shape: none;" +
+                "arrow-shape: none;" +
+                "text-mode: hidden;" +
                 "}" +
                 "node {" +
-                //"size: 20px;" +
+                "size: 10px;" +
+                "text-alignment: at-right;" +
+                "text-padding: 3px, 2px;" +
+                "text-background-mode: rounded-box;" +
+                "text-background-color: #EB2;" +
+                "text-color: #222;" +
                 "}");
 
         // Translating vertices to graphstream graph
@@ -45,13 +51,12 @@ public class Visualiser{
 
     public void start() {
         // Curving edges with same vertices and opposite directions
-        //System.setProperty("gs.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
+        System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
         updateColor();
         visualisedGraph.display();
     }
 
     public void updateGraph(MuvtoGraph graph, MuvtoSolution solution) {
-        //todo jednostopniowe update.. może być ta funkcja
         mapping.updateGraph(graph);
         referenceGraph = graph;
         updateColor();

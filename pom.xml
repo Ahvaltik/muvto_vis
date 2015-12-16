@@ -103,6 +103,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.graphstream</groupId>
+            <artifactId>gs-ui</artifactId>
+            <version>${graphstream.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.uma.jmetal</groupId>
             <artifactId>jmetal-core</artifactId>
             <version>${jmetal.version}</version>

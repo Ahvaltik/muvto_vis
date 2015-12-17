@@ -12,6 +12,7 @@ import java.util.HashMap;
 
 public class GraphMapping {
     private HashMap<MuvtoVertex,Node> vertexMap;
+    private HashMap<Node,MuvtoVertex> nodeMap;
     private HashMap<MuvtoEdge,Edge> edgeMap;
     Graph mGraph;
 
@@ -19,6 +20,7 @@ public class GraphMapping {
         mGraph = new SingleGraph(graph.toString());
         vertexMap = new HashMap<>();
         edgeMap = new HashMap<>();
+        nodeMap = new HashMap<>();
 
         // Translating vertices to graphstream graph
         for(MuvtoVertex vertex: graph.vertexSet()){
@@ -26,6 +28,7 @@ public class GraphMapping {
 
             //create map for further edition purposes
             vertexMap.put(vertex, node);
+            nodeMap.put(node, vertex);
         }
         // Translating edges to graphstream graph
         for(MuvtoEdge edge: graph.edgeSet()){
@@ -46,7 +49,17 @@ public class GraphMapping {
         return edgeMap.get(edge);
     }
 
-    public Node getVertex(MuvtoVertex vertex){
+    public Node getNode(MuvtoVertex vertex){
         return vertexMap.get(vertex);
+    }
+
+    public MuvtoVertex getVertex(Node node) { return nodeMap.get(node); }
+
+    public void updateGraph(MuvtoGraph graph) {
+        edgeMap = new HashMap<>();
+        for(MuvtoEdge edge: graph.edgeSet()){
+            Edge visualisedEdge = mGraph.getEdge(edge.toString());
+            edgeMap.put(edge, visualisedEdge);
+        }
     }
 }

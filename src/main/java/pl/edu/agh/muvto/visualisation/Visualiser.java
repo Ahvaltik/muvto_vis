@@ -25,7 +25,7 @@ public class Visualiser{
                 "size: 3px;" +
                 "fill-mode: dyn-plain;" +
                 "fill-color: green, red;" +
-                "arrow-shape: none;" +
+                "arrow-size: 40px, 7px;" +
                 "text-mode: hidden;" +
                 "}" +
                 "node {" +
@@ -34,6 +34,7 @@ public class Visualiser{
                 "text-padding: 3px, 2px;" +
                 "text-background-mode: rounded-box;" +
                 "text-background-color: #EB2;" +
+                "text-offset: 5px, 0px;" +
                 "text-color: #222;" +
                 "}");
 

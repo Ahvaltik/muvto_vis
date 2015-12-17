@@ -1,5 +1,7 @@
 package pl.edu.agh.muvto;
 
+import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -22,6 +24,9 @@ import pl.edu.agh.muvto.util.Holder;
 @Component
 public class Simulation {
 
+    private static final Logger logger
+        = LoggerFactory.getLogger(Simulation.class);
+
     @Autowired
     private MuvtoSolverProvider solverProvider;
 
@@ -31,64 +36,90 @@ public class Simulation {
     @Value("${muvto.solver.maxTransfer}")
     private int maxTransfer;
 
-    private static final Logger logger
-        = LoggerFactory.getLogger(Simulation.class);
+    @Value("${muvto.solver.maxDelta}")
+    private int maxDelta;
+
+    @Value("${muvto.predictor.maxAllowedDist}")
+    private double maxAllowedDist;
+
+    @Value("${muvto.simulation.steps}")
+    private int steps;
+    
+    @Value("${muvto.simulation.sleep}")
+    private int sleep;
+
 
     public void runSimulation(MuvtoGraph initialGraph) {
 
         logger.debug("graph: " + initialGraph);
 
-        MuvtoProblem initialProblem = new MuvtoProblem(initialGraph,
-                                                       maxTransfer);
-
-        solverProvider.addPredictedProblem(initialProblem);
-
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        solverProvider.getSolution(initialProblem, 10);
-
         Holder<F2<MuvtoGraph, Integer, MuvtoGraph>> step
             = new Holder<>();
 
-        GraphPredictor predictor = new GraphPredictor(initialGraph,
-                                                      maxTransfer);
+        GraphPredictor predictor = new GraphPredictor(initialGraph);
+        predictor.updateData(initialGraph);
 
         step.f = (graph, i) -> {
 
-            logger.debug("fill: " + graph.edgeSet()
-                .stream().map(MuvtoEdge::getFill)
-                .collect(Collectors.toList()));
+            MuvtoGraph newGraph = simulationStep(graph, predictor);
 
-            MuvtoProblem problem =new MuvtoProblem(graph,
-                                                   maxTransfer);
-            BinarySolution solution = solverProvider.getSolution(problem, 10);
-
-            logger.debug("setup: " + IntStream
-                    .range(0, solution.getNumberOfVariables())
-                    .mapToObj(solution::getVariableValueString)
-                    .collect(Collectors.joining()));
-
-            double objective = solution.getObjective(0);
-            logger.debug("objective: " + objective);
-
-            MuvtoGraph newGraph =
-                    transformer.graphFlow(graph,
-                                          solution,
-                                          maxTransfer);
-
-            logger.debug("difference: " + problem.distance(
-                    new MuvtoProblem(newGraph, maxTransfer)));
+            try {
+                Thread.sleep(sleep);
+            } catch(InterruptedException e) {
+                logger.error("Interrupted", e);
+            }
 
             return (i > 0) ? step.f.f(newGraph, i-1) : newGraph;
         };
 
-        final int steps = 10;
         step.f.f(initialGraph, steps);
 
         logger.debug("done");
+    }
+
+    private MuvtoGraph simulationStep(MuvtoGraph graph,
+                                      GraphPredictor predictor) {
+
+        logger.debug("STEP -------------------------------------------------");
+
+        logger.debug(" fill: " + extractEdgeAttrs(graph, MuvtoEdge::getFill));
+        logger.debug(" attr: " + extractEdgeAttrs(graph,
+                                    MuvtoEdge::getEffectiveAttractiveness));
+
+        MuvtoProblem problem = new MuvtoProblem(graph, maxTransfer);
+
+        BinarySolution solution = solverProvider.getSolution(problem,
+                                                             maxAllowedDist);
+
+        logger.debug("setup: " + IntStream
+                .range(0, solution.getNumberOfVariables())
+                .mapToObj(solution::getVariableValueString)
+                .collect(Collectors.joining()));
+
+        logger.debug("objective: " + solution.getObjective(0));
+
+        MuvtoGraph newGraph
+            = transformer.graphFlow(graph, solution, maxTransfer);
+
+        newGraph
+            = transformer.graphTrafficDelta(newGraph, maxDelta);
+
+//        predictor.updateData(graph);
+//        MuvtoGraph predictedGraph = predictor.getPredictedGraph(graph);
+//        solverProvider.addPredictedProblem(new MuvtoProblem(predictedGraph,
+//                                                            maxTransfer));
+
+        // TODO consider predicting more entries here
+
+        logger.debug(" distance: " + graph.distanceTo(newGraph));
+
+        return newGraph;
+    }
+
+    private static <T> List<T> extractEdgeAttrs(MuvtoGraph graph,
+                                                Function<MuvtoEdge, T> f) {
+        return graph.edgeSet()
+                .stream().map(f)
+                .collect(Collectors.toList());
     }
 }

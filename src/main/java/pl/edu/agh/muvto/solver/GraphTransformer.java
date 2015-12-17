@@ -3,6 +3,7 @@ package pl.edu.agh.muvto.solver;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
@@ -25,14 +26,29 @@ import pl.edu.agh.muvto.model.MuvtoVertex;
 @Component
 public class GraphTransformer {
 
+    private Random prng = new Random();
+
     public MuvtoGraph graphFlow(MuvtoGraph graph,
                                 BinarySolution solution,
                                 int maxTransfer) {
+        return applyEdgeDelta(graph,
+                              calculateEdgeDelta(graph,
+                                                 solution,
+                                                 maxTransfer));
+    }
 
-        TreeMap<Integer, Integer> edgeDelta = calculateEdgeDelta(graph,
-                                                                 solution,
-                                                                 maxTransfer);
+    public MuvtoGraph graphTrafficDelta(MuvtoGraph graph,
+                                        int maxDelta) {
+        int d = maxDelta;
+        int d2 = 2*maxDelta;
+        return applyEdgeDelta(graph,
+                              List.list(graph.edgeSet())
+                                  .groupBy(MuvtoEdge::getId)
+                                  .map((e) -> Math.max(prng.nextInt(d2)-d, 0)));
+    }
 
+    private MuvtoGraph applyEdgeDelta(MuvtoGraph graph,
+                                      TreeMap<Integer, Integer> edgeDelta) {
         return Stream.stream(graph.edgeSet())
                 .foldLeft((newGraph, oldEdge) -> {
                     int deltaFill = edgeDelta.get(oldEdge.getId()).orSome(0);

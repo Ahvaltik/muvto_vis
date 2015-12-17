@@ -45,7 +45,7 @@ public class MuvtoEdge extends EntityWithId {
     }
 
     public double getEffectiveAttractiveness() {
-        return (1 + 0.5 * getWeight()) * getBaseAttractiveness();
+        return (1 - 0.5 * getWeight()) * getBaseAttractiveness();
     }
 
     public double distanceTo(MuvtoEdge other) {

@@ -98,7 +98,7 @@ public class MuvtoSolverProvider {
                                       double maxAllowedDist) {
         return solutionsMap.keySet().stream()
             .map(problem -> P.p(problem, realProblem.distance(problem)))
-            .filter(p -> p._2() < maxAllowedDist)
+//            .filter(p -> p._2() < maxAllowedDist)
             .min(Comparator.comparing(P2::_2))
             .map(p -> {
                 String message = "using predicted solution [distance=%f]";

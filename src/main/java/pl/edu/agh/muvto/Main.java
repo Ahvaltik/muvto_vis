@@ -22,6 +22,7 @@ import pl.edu.agh.muvto.model.MuvtoGraph;
 import pl.edu.agh.muvto.model.MuvtoVertex;
 import pl.edu.agh.muvto.solver.MuvtoProblem;
 import pl.edu.agh.muvto.solver.MuvtoSolver;
+import pl.edu.agh.muvto.visualisation.VisualisationController;
 import pl.edu.agh.muvto.visualisation.Visualiser;
 
 /**
@@ -49,17 +50,17 @@ public class Main {
     private MuvtoSolver solver;
 
     private void start(String[] args) {
-
+        VisualisationController visualisationController = new VisualisationController();
         loadGraph("test-graph-01.txt")
             .bimap(Util.liftVoid(Exception::printStackTrace),
                    Util.liftVoid(graph -> {
 
                        logger.debug("graph: "+ graph);
-                       Visualiser visualiser = new Visualiser(graph);
-                       visualiser.start();
                        MuvtoProblem problem = new MuvtoProblem(graph);
 
                        BinarySolution solution = solver.solve(problem);
+
+                       visualisationController.updateGraph(graph, solution);
 
                        problem.evaluate(solution);
                        double objective = solution.getObjective(0);

@@ -3,10 +3,10 @@ package pl.edu.agh.muvto.visualisation;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
+import org.uma.jmetal.solution.BinarySolution;
 import pl.edu.agh.muvto.model.MuvtoEdge;
 import pl.edu.agh.muvto.model.MuvtoGraph;
 import pl.edu.agh.muvto.model.MuvtoVertex;
-import pl.edu.agh.muvto.solver.MuvtoSolution;
 import pl.edu.agh.muvto.visualisation.mapping.GraphMapping;
 
 public class Visualiser{
@@ -57,7 +57,7 @@ public class Visualiser{
         visualisedGraph.display();
     }
 
-    public void updateGraph(MuvtoGraph graph, MuvtoSolution solution) {
+    public void updateGraph(MuvtoGraph graph, BinarySolution solution) {
         mapping.updateGraph(graph);
         referenceGraph = graph;
         updateColor();

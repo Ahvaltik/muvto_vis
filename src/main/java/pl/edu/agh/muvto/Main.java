@@ -89,7 +89,7 @@ public class Main {
                    Util.liftVoid(initialGraph -> {
 
                        logger.debug("graph: " + initialGraph);
-                       visualisationController.updateGraph(initialGraph, null); // TODO refactor
+                       visualisationController.initializeGraphDisplay(initialGraph);
 
                        Holder<F2<MuvtoGraph, Integer, MuvtoGraph>> step
                            = new Holder<>();

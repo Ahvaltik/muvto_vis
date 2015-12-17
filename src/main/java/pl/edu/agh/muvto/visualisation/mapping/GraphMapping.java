@@ -49,11 +49,11 @@ public class GraphMapping {
         return edgeMap.get(edge);
     }
 
-    public Node getNode(MuvtoVertex vertex){
+    public Node getVertex(MuvtoVertex vertex){
         return vertexMap.get(vertex);
     }
 
-    public MuvtoVertex getVertex(Node node) { return nodeMap.get(node); }
+    public MuvtoVertex getNode(Node node) { return nodeMap.get(node); }
 
     public void updateGraph(MuvtoGraph graph) {
         edgeMap = new HashMap<>();

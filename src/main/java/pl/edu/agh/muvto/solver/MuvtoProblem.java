@@ -16,6 +16,7 @@ public class MuvtoProblem extends AbstractBinaryProblem {
 
     private static final long serialVersionUID = 1L;
 
+    @SuppressWarnings("unused")
     private static final Logger logger
         = LoggerFactory.getLogger(MuvtoProblem.class);
 
@@ -72,15 +73,4 @@ public class MuvtoProblem extends AbstractBinaryProblem {
     public double distance(MuvtoProblem other) {
         return this.graph.distanceTo(other.graph);
     }
-
-//    public float distance(MuvtoProblem otherProblem){
-//        float dist = 0;
-//        otherProblem.graph.
-//        for(MuvtoEdge edge : this.graph.edgeSet()){
-//            dist += Math.abs(edge.getFill() - otherProblem.graph.getEdge(this.graph.getEdgeSource(edge), this.graph.getEdgeTarget(edge)).getFill());
-//        }
-//        dist /= this.graph.edgeSet().size();
-//    	return dist;
-//    }
-
 }

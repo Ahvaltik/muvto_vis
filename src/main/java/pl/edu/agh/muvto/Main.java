@@ -1,18 +1,22 @@
 package pl.edu.agh.muvto;
 
+import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Component;
 import org.uma.jmetal.solution.BinarySolution;
 
+import fj.F2;
 import fj.P;
 import fj.Try;
 import fj.data.Either;
@@ -20,10 +24,13 @@ import fj.data.Stream;
 import pl.edu.agh.muvto.model.MuvtoEdge;
 import pl.edu.agh.muvto.model.MuvtoGraph;
 import pl.edu.agh.muvto.model.MuvtoVertex;
+import pl.edu.agh.muvto.predictor.MuvtoPredictor;
+import pl.edu.agh.muvto.solver.GraphTransformer;
 import pl.edu.agh.muvto.solver.MuvtoProblem;
 import pl.edu.agh.muvto.solver.MuvtoSolver;
 import pl.edu.agh.muvto.visualisation.VisualisationController;
-import pl.edu.agh.muvto.visualisation.Visualiser;
+import pl.edu.agh.muvto.util.Holder;
+import pl.edu.agh.muvto.util.Util;
 
 /**
  * Main class.
@@ -38,39 +45,84 @@ public class Main {
      * @param args
      */
     public static void main(String[] args) {
-
+      
         @SuppressWarnings("resource")
         ApplicationContext context = 
                 new ClassPathXmlApplicationContext("applicationContext.xml");
 
         (context.getBean(Main.class)).start(args);
+        
+        runPredictorSample();
+    }
+    
+    private static void runPredictorSample(){
+        /* PREDICTION SAMPLE */
+        MuvtoPredictor pred = new MuvtoPredictor(0);
+        
+        try {
+          pred.updateData(0.0);
+          pred.updateData(2.0);
+          pred.updateData(3.0);
+  
+        } catch (IOException e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+        }
+      
+        System.out.println(pred.predict(2.0));
+        System.out.println(Arrays.toString(pred.predict(2.0, 3)));
     }
 
     @Autowired
     private MuvtoSolver solver;
 
+    @Autowired
+    private GraphTransformer transformer;
+
+    @Value("${muvto.solver.maxTransfer}")
+    private int maxTransfer;
+
     private void start(String[] args) {
         VisualisationController visualisationController = new VisualisationController();
         loadGraph("test-graph-01.txt")
             .bimap(Util.liftVoid(Exception::printStackTrace),
-                   Util.liftVoid(graph -> {
+                   Util.liftVoid(initialGraph -> {
 
-                       logger.debug("graph: "+ graph);
-                       MuvtoProblem problem = new MuvtoProblem(graph);
+                       logger.debug("graph: " + initialGraph);
+                       visualisationController.updateGraph(initialGraph, null); // TODO refactor
 
-                       BinarySolution solution = solver.solve(problem);
+                       Holder<F2<MuvtoGraph, Integer, MuvtoGraph>> step
+                           = new Holder<>();
 
-                       visualisationController.updateGraph(graph, solution);
+                       step.f = (graph, i) -> {
 
-                       problem.evaluate(solution);
-                       double objective = solution.getObjective(0);
+                           logger.debug("fill: " + graph.edgeSet()
+                               .stream().map(MuvtoEdge::getFill)
+                               .collect(Collectors.toList()));
 
-                       logger.debug("solution objective: " + objective);
+                           MuvtoProblem problem =new MuvtoProblem(graph,
+                                                                  maxTransfer);
+                           BinarySolution solution = solver.solve(problem);
 
-                       IntStream.range(0, solution.getNumberOfVariables())
-                           .mapToObj(solution::getVariableValueString)
-                           .forEach(logger::debug);
+                           logger.debug("setup: " + IntStream
+                                   .range(0, solution.getNumberOfVariables())
+                                   .mapToObj(solution::getVariableValueString)
+                                   .collect(Collectors.joining()));
 
+                           double objective = solution.getObjective(0);
+                           logger.debug("objective: " + objective);
+
+                           MuvtoGraph newGraph =
+                                   transformer.graphFlow(graph,
+                                                         solution,
+                                                         maxTransfer);
+                           visualisationController.updateGraph(newGraph, solution);
+                           return (i > 0) ? step.f.f(newGraph, i-1) : newGraph;
+                       };
+
+                       final int steps = 10;
+                       step.f.f(initialGraph, steps);
+                       visualisationController.stopVisualisation();
                        logger.debug("done");
                    }));
     }

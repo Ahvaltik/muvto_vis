@@ -46,4 +46,9 @@
         <constructor-arg ref="geneticAlgorithmBuilder"></constructor-arg>
     </bean>
 
+    <bean id="solverProvider"
+          class="pl.edu.agh.muvto.solver.MuvtoSolverProvider">
+        <constructor-arg value="4" />
+    </bean>
+
 </beans>

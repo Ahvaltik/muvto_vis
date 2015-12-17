@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Component;
 import org.uma.jmetal.solution.BinarySolution;
@@ -29,7 +30,6 @@ import pl.edu.agh.muvto.predictor.GraphPredictor;
 import pl.edu.agh.muvto.predictor.MuvtoPredictor;
 import pl.edu.agh.muvto.solver.GraphTransformer;
 import pl.edu.agh.muvto.solver.MuvtoProblem;
-import pl.edu.agh.muvto.solver.MuvtoSolver;
 import pl.edu.agh.muvto.solver.MuvtoSolverProvider;
 import pl.edu.agh.muvto.util.Holder;
 import pl.edu.agh.muvto.util.Util;
@@ -47,36 +47,34 @@ public class Main {
      * @param args
      */
     public static void main(String[] args) {
-      
-        @SuppressWarnings("resource")
-        ApplicationContext context = 
-                new ClassPathXmlApplicationContext("applicationContext.xml");
 
-        (context.getBean(Main.class)).start(args);
-        
-        //runPredictorSample();
+        try (ClassPathXmlApplicationContext context
+            = new ClassPathXmlApplicationContext("applicationContext.xml"))
+        {
+            (context.getBean(Main.class)).start(args);
+//            runPredictorSample();
+            logger.info("main done");
+        }
     }
-    
+
     private static void runPredictorSample(){
         /* PREDICTION SAMPLE */
         MuvtoPredictor pred = new MuvtoPredictor(0);
-        
+
         try {
           pred.updateData(0.0);
           pred.updateData(2.0);
           pred.updateData(3.0);
-  
         } catch (IOException e) {
-          // TODO Auto-generated catch block
           e.printStackTrace();
         }
-      
+
         System.out.println(pred.predict(2.0));
         System.out.println(Arrays.toString(pred.predict(2.0, 3)));
     }
 
     @Autowired
-    MuvtoSolverProvider solverProvider;
+    private MuvtoSolverProvider solverProvider;
 
     @Autowired
     private GraphTransformer transformer;

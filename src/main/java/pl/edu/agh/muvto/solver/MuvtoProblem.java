@@ -68,14 +68,19 @@ public class MuvtoProblem extends AbstractBinaryProblem {
                 new RuntimeException("Invalid variable number")
             );
     }
-    
-    public float distance(MuvtoProblem secondProblem){
-    	float dist = 0;
-    	for(MuvtoEdge edge : this.graph.edgeSet()){
-    		dist += Math.abs(edge.getFill() - secondProblem.graph.getEdge(this.graph.getEdgeSource(edge), this.graph.getEdgeTarget(edge)).getFill());
-    	}
-    	dist /= this.graph.edgeSet().size();
-    	return dist;
+
+    public double distance(MuvtoProblem other) {
+        return this.graph.distanceTo(other.graph);
     }
+
+//    public float distance(MuvtoProblem otherProblem){
+//        float dist = 0;
+//        otherProblem.graph.
+//        for(MuvtoEdge edge : this.graph.edgeSet()){
+//            dist += Math.abs(edge.getFill() - otherProblem.graph.getEdge(this.graph.getEdgeSource(edge), this.graph.getEdgeTarget(edge)).getFill());
+//        }
+//        dist /= this.graph.edgeSet().size();
+//    	return dist;
+//    }
 
 }

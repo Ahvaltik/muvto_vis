@@ -16,7 +16,8 @@ import java.util.stream.Collectors;
  */
 public class GraphPredictor {
 
-    private static final Logger logger = LoggerFactory.getLogger(GraphPredictor.class);
+    private static final Logger logger =
+            LoggerFactory.getLogger(GraphPredictor.class);
     private Map<Integer, MuvtoPredictor> predictors;
     private PredictionExecutor executor;
     private int maxTransfer;

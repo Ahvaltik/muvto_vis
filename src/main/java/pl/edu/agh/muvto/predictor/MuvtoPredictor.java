@@ -23,7 +23,10 @@ public class MuvtoPredictor {
     private double momentum;
     private int epochs;
     private Boolean testData;
-    private String pathToFile;
+    private String pathToDataFile;
+    private String pathToPredictorFile;
+    private Double lastUpdatedValue;
+    
 
     public MuvtoPredictor(int N,
                           int edgeId,
@@ -37,11 +40,16 @@ public class MuvtoPredictor {
         this.momentum = momentum;
         this.epochs = epochs;
         this.testData = testData;
+        this.lastUpdatedValue = null;
 
         try {
-            this.pathToFile = File
+            this.pathToDataFile = File
                     .createTempFile("data_" + edgeId, ".csv")
                     .getAbsolutePath();
+            
+            this.pathToPredictorFile = File
+                .createTempFile("predictor_" + edgeId, ".csv")
+                .getAbsolutePath();
         } catch (IOException e) {
             logger.error(e.getMessage());
             e.printStackTrace();
@@ -54,15 +62,23 @@ public class MuvtoPredictor {
 
     public void updateData(Double sample) throws IOException {
         this.data.add(sample);
+        this.lastUpdatedValue = sample;
         writeDataToFile();
     }
 
-    public Double predict(Double value){
+    public Double predict(Double value){      
         return predict(value, 1)[0];
     }
+    
+    public Double predict() throws UnsupportedOperationException{
+      if(this.lastUpdatedValue != null){
+        return predict(this.lastUpdatedValue);
+      }
+      
+      throw new UnsupportedOperationException("You can't predict on empty dataset");
+    }
 
-    public Double[] predict(Double value, int steps) {
-
+    public Double[] predict(Double value, int steps) {        
         Double[] result = new Double[steps];
 
         try {
@@ -76,7 +92,8 @@ public class MuvtoPredictor {
                         .exec(new String[]{
                                 "python",
                                 PREDICTOR_SCRIPT,
-                                this.pathToFile,
+                                this.pathToDataFile,
+                                this.pathToPredictorFile,
                                 String.valueOf(this.learningrate),
                                 String.valueOf(this.momentum),
                                 String.valueOf(this.epochs),
@@ -98,6 +115,14 @@ public class MuvtoPredictor {
                 stdError.lines().forEach(logger::error);
 
                 p.waitFor();
+                
+                this.data.clear();
+                try {
+                  writeDataToFile();
+                } catch (IOException e1) {
+                  // TODO Auto-generated catch block
+                  e1.printStackTrace();
+                }
             }
             catch (IOException | InterruptedException e) {
                 System.out.println("exception happened: ");
@@ -118,7 +143,7 @@ public class MuvtoPredictor {
     public void writeDataToFile() throws IOException {
         BufferedWriter outputWriter = null;
         outputWriter = new BufferedWriter(
-            new FileWriter(this.pathToFile));
+            new FileWriter(this.pathToDataFile));
 
         for (int i = 0; i < this.data.size(); i++) {
             outputWriter.write(this.data.get(i)+",");

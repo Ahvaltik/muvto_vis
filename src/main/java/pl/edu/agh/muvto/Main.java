@@ -38,7 +38,7 @@ public class Main {
      * @param args
      */
     public static void main(String[] args) {
-
+    
         try (ClassPathXmlApplicationContext context
             = new ClassPathXmlApplicationContext("applicationContext.xml"))
         {
@@ -56,18 +56,51 @@ public class Main {
     @SuppressWarnings("unused")
     private static void runPredictorSample() {
 
-        MuvtoPredictor pred = new MuvtoPredictor(0);
+      MuvtoPredictor pred = new MuvtoPredictor(0);
+      try {
+        
+        pred.updateData(1.0);
+        pred.updateData(2.0);
+        pred.updateData(3.0);
+ 
+        /*prediction is executed for the first time. 
+         * whole network is being initialized
+         * network trains itself on previous data
+         * the longest part of "predict" execution
+         */
+        long time1 = System.currentTimeMillis();
+        System.out.println(pred.predict(3.0));
+        
 
-        try {
-          pred.updateData(0.0);
-          pred.updateData(2.0);
-          pred.updateData(3.0);
-        } catch (IOException e) {
-          e.printStackTrace();
-        }
-
+        /*prediction without new data
+         * network has been already initialized
+         * so it is read from tmp file
+         * shortest execution of "predict"
+         * */
+        long time2 = System.currentTimeMillis();
+        System.out.println(time2 - time1);
+        System.out.println(pred.predict(1.0));
+        
+        
+        /*One new data has been added
+         *network has been already initialized
+         *short execution of "predict"
+         **/
+        long time3 = System.currentTimeMillis();
+        System.out.println(time3 - time2);
+        pred.updateData(3.0);
         System.out.println(pred.predict(2.0));
-        System.out.println(Arrays.toString(pred.predict(2.0, 3)));
+        
+        
+        long time4 = System.currentTimeMillis();
+        System.out.println(time4 - time3);
+        
+        System.out.println(pred.predict());
+        
+      } catch (IOException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
     }
 
     /**

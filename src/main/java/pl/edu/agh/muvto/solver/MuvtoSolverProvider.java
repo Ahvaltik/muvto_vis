@@ -14,6 +14,8 @@ import org.uma.jmetal.solution.BinarySolution;
 
 import fj.P;
 import fj.P2;
+import pl.edu.agh.muvto.Simulation;
+import pl.edu.agh.muvto.model.MuvtoEdge;
 
 public class MuvtoSolverProvider {
 
@@ -74,7 +76,9 @@ public class MuvtoSolverProvider {
                 }
 
                 synchronized (logger) {
-                    logger.info("worker calculates solution");
+                    logger.info("worker calculates solution for " +
+                            Simulation.extractEdgeAttrs(
+                                    problem.getGraph(), MuvtoEdge::getFill));
                 }
 
                 BinarySolution solution = muvtoSolver.solve(problem);
@@ -96,6 +100,7 @@ public class MuvtoSolverProvider {
 
     public BinarySolution getSolution(MuvtoProblem realProblem,
                                       double maxAllowedDist) {
+        logger.info("Seeking predicted problem in set of " + solutionsMap.size());
         return solutionsMap.keySet().stream()
             .map(problem -> P.p(problem, realProblem.distance(problem)))
 //            .filter(p -> p._2() < maxAllowedDist)
@@ -103,7 +108,10 @@ public class MuvtoSolverProvider {
             .map(p -> {
                 String message = "using predicted solution [distance=%f]";
                 logger.info(String.format(message, p._2()));
-                return solutionsMap.get(p._1());
+                MuvtoProblem predictedProblem = p._1();
+                logger.debug(" predicted: " + Simulation.extractEdgeAttrs(
+                        predictedProblem.getGraph(), MuvtoEdge::getFill));
+                return solutionsMap.get(predictedProblem);
             }).orElseGet(() -> {
                 logger.warn("calculating solution from a scratch!");
                 return muvtoSolver.solve(realProblem);

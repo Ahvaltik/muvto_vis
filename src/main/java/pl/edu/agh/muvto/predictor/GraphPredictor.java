@@ -31,8 +31,10 @@ public class GraphPredictor {
     public void updateData(MuvtoGraph graph) {
         graph.edgeSet().parallelStream().forEach(edge -> {
             try {
-                predictors.get(edge.getId())
-                        .updateData(edge.getWeight());
+                double fill = edge.getFill();
+                logger.info("Updating predictor {} with fill: {}",
+                        edge.getId(), fill);
+                predictors.get(edge.getId()).updateData(fill);
             } catch (IOException exc) {
                 logger.error("Update failed", exc);
             }
@@ -47,6 +49,8 @@ public class GraphPredictor {
                             .get(oldEdge.getId())
                             .predict(Double.valueOf(oldEdge.getFill()))
                             .intValue();
+                    logger.info("Predicting value at {}: {} ",
+                            oldEdge.getId(), newFill);
                     MuvtoVertex srcVertex = reference.getEdgeSource(oldEdge);
                     MuvtoVertex tgtVertex = reference.getEdgeTarget(oldEdge);
                     newGraph.addVertex(srcVertex);

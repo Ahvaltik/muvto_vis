@@ -101,13 +101,13 @@ public class Simulation {
         MuvtoGraph newGraph
             = transformer.graphFlow(graph, solution, maxTransfer);
 
-        newGraph
-            = transformer.graphTrafficDelta(newGraph, maxDelta);
+//        newGraph
+//            = transformer.graphTrafficDelta(newGraph, maxDelta);
 
-//        predictor.updateData(graph);
-//        MuvtoGraph predictedGraph = predictor.getPredictedGraph(graph);
-//        solverProvider.addPredictedProblem(new MuvtoProblem(predictedGraph,
-//                                                            maxTransfer));
+        predictor.updateData(graph);
+        MuvtoGraph predictedGraph = predictor.getPredictedGraph(graph);
+        solverProvider.addPredictedProblem(new MuvtoProblem(predictedGraph,
+                                                            maxTransfer));
 
         // TODO consider predicting more entries here
 
@@ -116,7 +116,7 @@ public class Simulation {
         return newGraph;
     }
 
-    private static <T> List<T> extractEdgeAttrs(MuvtoGraph graph,
+    public static <T> List<T> extractEdgeAttrs(MuvtoGraph graph,
                                                 Function<MuvtoEdge, T> f) {
         return graph.edgeSet()
                 .stream().map(f)

@@ -33,6 +33,10 @@ public class MuvtoProblem extends AbstractBinaryProblem {
         setName("MuvtoProblem");
     }
 
+    public MuvtoGraph getGraph() {
+        return graph;
+    }
+
     @Override
     public void evaluate(BinarySolution solution) {
 

@@ -47,7 +47,7 @@ public class GraphPredictor {
                 .foldLeft((newGraph, oldEdge) -> {
                     int newFill = predictors
                             .get(oldEdge.getId())
-                            .predict(Double.valueOf(oldEdge.getFill()))
+                            .predict()
                             .intValue();
                     logger.info("[predictor {}] {} predicted to {}",
                             oldEdge.getId(), oldEdge.getFill(), newFill);

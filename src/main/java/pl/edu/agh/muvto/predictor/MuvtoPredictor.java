@@ -78,7 +78,7 @@ public class MuvtoPredictor {
       throw new UnsupportedOperationException("You can't predict on empty dataset");
     }
 
-    public Double[] predict(Double value, int steps) {        
+    public Double[] predict(Double value, int steps) {
         Double[] result = new Double[steps];
 
         try {
@@ -116,11 +116,10 @@ public class MuvtoPredictor {
 
                 p.waitFor();
 
-                this.data.clear();
+//                this.data.clear(); // FIXME wtf is this ????
                 try {
                   writeDataToFile();
                 } catch (IOException e1) {
-                  // TODO Auto-generated catch block
                   e1.printStackTrace();
                 }
             }

@@ -14,7 +14,7 @@ public class MuvtoPredictor {
 
     private static final Logger logger =
             LoggerFactory.getLogger(MuvtoPredictor.class);
-    
+
     private static final String PREDICTOR_SCRIPT =
             "src/main/resources/prediction.py";
 
@@ -26,7 +26,7 @@ public class MuvtoPredictor {
     private String pathToDataFile;
     private String pathToPredictorFile;
     private Double lastUpdatedValue;
-    
+
 
     public MuvtoPredictor(int N,
                           int edgeId,
@@ -46,7 +46,7 @@ public class MuvtoPredictor {
             this.pathToDataFile = File
                     .createTempFile("data_" + edgeId, ".csv")
                     .getAbsolutePath();
-            
+
             this.pathToPredictorFile = File
                 .createTempFile("predictor_" + edgeId, ".csv")
                 .getAbsolutePath();
@@ -66,15 +66,15 @@ public class MuvtoPredictor {
         writeDataToFile();
     }
 
-    public Double predict(Double value){      
+    public Double predict(Double value){
         return predict(value, 1)[0];
     }
-    
+
     public Double predict() throws UnsupportedOperationException{
       if(this.lastUpdatedValue != null){
         return predict(this.lastUpdatedValue);
       }
-      
+
       throw new UnsupportedOperationException("You can't predict on empty dataset");
     }
 
@@ -115,7 +115,7 @@ public class MuvtoPredictor {
                 stdError.lines().forEach(logger::error);
 
                 p.waitFor();
-                
+
                 this.data.clear();
                 try {
                   writeDataToFile();

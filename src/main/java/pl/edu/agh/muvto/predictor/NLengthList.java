@@ -30,11 +30,11 @@ public class NLengthList<T> implements Iterable<T>{
             list.add(elem);
         }
     }
-    
+
     public void clear(){
       list.clear();
     }
-    
+
     public T last(){
       if(list.size() > 0)
         return list.get(list.size() - 1);

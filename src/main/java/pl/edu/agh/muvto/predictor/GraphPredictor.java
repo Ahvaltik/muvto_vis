@@ -32,7 +32,7 @@ public class GraphPredictor {
         graph.edgeSet().parallelStream().forEach(edge -> {
             try {
                 double fill = edge.getFill();
-                logger.info("Updating predictor {} with fill: {}",
+                logger.info("[predictor {}] update with fill: {}",
                         edge.getId(), fill);
                 predictors.get(edge.getId()).updateData(fill);
             } catch (IOException exc) {
@@ -49,8 +49,8 @@ public class GraphPredictor {
                             .get(oldEdge.getId())
                             .predict(Double.valueOf(oldEdge.getFill()))
                             .intValue();
-                    logger.info("Predicting value at {}: {} ",
-                            oldEdge.getId(), newFill);
+                    logger.info("[predictor {}] {} predicted to {}",
+                            oldEdge.getId(), oldEdge.getFill(), newFill);
                     MuvtoVertex srcVertex = reference.getEdgeSource(oldEdge);
                     MuvtoVertex tgtVertex = reference.getEdgeTarget(oldEdge);
                     newGraph.addVertex(srcVertex);

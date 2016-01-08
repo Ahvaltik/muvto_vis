@@ -1,3 +1,4 @@
+from __future__ import print_function
 from pybrain.datasets import SupervisedDataSet
 from pybrain.tools.shortcuts import buildNetwork
 from pybrain.supervised import BackpropTrainer
@@ -18,7 +19,7 @@ class PythonPredictor(object):
         self.learningrate = float(learningrate)
         self.momentum = float(momentum)
         self.epochs = int(epochs)
-        
+
         if test_verbose == "true":
             self.test_verbose = True
         else:
@@ -33,6 +34,8 @@ class PythonPredictor(object):
 
         values = self.read_data_from_file()
         old_value = None
+
+        # print("DataSet: {} ", values, file=sys.stderr)        
 
         for val in values:
             if old_value != None and val != "":
@@ -58,6 +61,7 @@ class PythonPredictor(object):
             self.network = buildNetwork(dataSet.indim, 4, dataSet.outdim,recurrent=True)
 
         t = None
+
 
         if len(dataSet) > 0:
             t = BackpropTrainer(self.network, dataSet, learningrate = self.learningrate, momentum = self.momentum, verbose = False)
@@ -103,7 +107,3 @@ if __name__ == '__main__':
     predictor.test(predictor.train(predictor.make_dataset()))
 
     predictor.predict(sys.argv[7], sys.argv[8])
-
-
-
-

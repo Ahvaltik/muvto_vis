@@ -26,6 +26,7 @@ public class MuvtoPredictor {
     private String pathToDataFile;
     private String pathToPredictorFile;
     private Double lastUpdatedValue;
+//    private 
 
 
     public MuvtoPredictor(int N,
@@ -115,8 +116,10 @@ public class MuvtoPredictor {
                 stdError.lines().forEach(logger::error);
 
                 p.waitFor();
-
-//                this.data.clear(); // FIXME wtf is this ????
+              
+                double last = this.data.last();
+                this.data.clear();
+                this.data.add(last);
                 try {
                   writeDataToFile();
                 } catch (IOException e1) {

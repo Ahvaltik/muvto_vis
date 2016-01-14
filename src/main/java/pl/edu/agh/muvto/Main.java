@@ -1,9 +1,9 @@
 package pl.edu.agh.muvto;
 
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Random;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Component;
 
+import fj.F;
 import fj.P;
 import fj.Try;
 import fj.data.Either;
@@ -41,13 +42,17 @@ public class Main {
         try (ClassPathXmlApplicationContext context
             = new ClassPathXmlApplicationContext("applicationContext.xml"))
         {
-            (context.getBean(Main.class)).start(args);
-            logger.info("done");
+            if (args.length > 0) {
+                (context.getBean(Main.class)).start(args[0]);
+                logger.info("done");
+            } else {
+                logger.error("Missing required graph file path.");
+            }
         }
     }
 
-    private void start(String[] args) {
-        loadGraph("test-graph-01.txt")
+    private void start(String graphFilePath) {
+        loadGraph(graphFilePath)
             .bimap(Util.liftVoid(Exception::printStackTrace),
                    Util.liftVoid(simulation::runSimulation));
     }
@@ -96,32 +101,48 @@ public class Main {
             e.printStackTrace();
         }
     }
+    
+    private <T,V> T getOr(V[] tab, int index, F<V,T> f, T def) {
+        if (index < tab.length) {
+            return f.f(tab[index]);
+        } else {
+            return def;
+        }
+    }
 
-    /**
-     * Loads graph from classpath resource.
-     * @param classpathFile
-     * @return loaded graph or exception
-     */
-    private Either<Exception, MuvtoGraph>
-        loadGraph(String classpathFile) {
+    private Either<IOException, MuvtoGraph> loadGraph(String filePath) {
+
+        Random prng = new Random(1);
 
         return Try.f(() -> {
-            ClassLoader classloader = Main.class.getClassLoader();
-            URI uri = classloader.getResource(classpathFile).toURI();
-            return Stream.stream(Files.readAllLines(Paths.get(uri)))
+            return Stream.stream(Files.readAllLines(Paths.get(filePath)))
                 .filter(s -> !s.startsWith("#"))
                 .map(line -> line.split("\\s+"))
                 .zipIndex()
                 .map(entry -> {
                     String[] row = entry._1();
                     int index = entry._2();
-                    return P.p(new MuvtoVertex(Integer.parseInt(row[0])),
-                               new MuvtoVertex(Integer.parseInt(row[1])),
+
+                    int fromVertexId = Integer.parseInt(row[0]);
+                    int toVertexId = Integer.parseInt(row[1]);
+
+                    int capacity = getOr(row,
+                                         2,
+                                         Integer::parseInt,
+                                         20 + prng.nextInt(101));
+                    int fill = getOr(
+                            row,
+                            3,
+                            Integer::parseInt,
+                            (int)(capacity + .5*(1. + prng.nextDouble())));
+                    double attract = getOr(row, 4, Double::parseDouble, 1.0);
+
+                    return P.p(new MuvtoVertex(fromVertexId),
+                               new MuvtoVertex(toVertexId),
                                new MuvtoEdge(index,
-                                             Integer.parseInt(row[2]),
-                                             Integer.parseInt(row[3]),
-                                             Double.parseDouble(row[4]))
-                              );
+                                             capacity,
+                                             fill,
+                                             attract));
                 })
                 .foldLeft((graph, data) -> {
                     graph.addVertex(data._1());

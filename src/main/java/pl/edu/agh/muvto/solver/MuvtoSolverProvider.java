@@ -76,9 +76,9 @@ public class MuvtoSolverProvider {
                 }
 
                 synchronized (logger) {
-                    logger.info("worker calculates solution for " +
-                            Simulation.extractEdgeAttrs(
-                                    problem.getGraph(), MuvtoEdge::getFill));
+//                    logger.info("worker calculates solution for " +
+//                            Simulation.extractEdgeAttrs(
+//                                    problem.getGraph(), MuvtoEdge::getFill));
                 }
 
                 BinarySolution solution = muvtoSolver.solve(problem);
@@ -109,8 +109,8 @@ public class MuvtoSolverProvider {
                 String message = "using predicted solution [distance=%f]";
                 logger.info(String.format(message, p._2()));
                 MuvtoProblem predictedProblem = p._1();
-                logger.debug(" predicted: " + Simulation.extractEdgeAttrs(
-                        predictedProblem.getGraph(), MuvtoEdge::getFill));
+//                logger.debug(" predicted: " + Simulation.extractEdgeAttrs(
+//                        predictedProblem.getGraph(), MuvtoEdge::getFill));
                 return solutionsMap.get(predictedProblem);
             }).orElseGet(() -> {
                 logger.warn("calculating solution from a scratch!");

@@ -167,6 +167,9 @@
         <configuration>
           <mainClass>pl.edu.agh.muvto.Main</mainClass>
           <arguments>
+            <argument>
+              ./src/main/resources/graphs/generated-50-4.txt
+            </argument>
           </arguments>
         </configuration>
       </plugin>

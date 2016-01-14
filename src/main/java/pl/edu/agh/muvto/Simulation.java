@@ -50,14 +50,20 @@ public class Simulation {
     private int sleep;
 
     private VisualisationController visualisationController;
+    
+    private static final boolean VISUALIZATION = false;
 
     public void runSimulation(MuvtoGraph initialGraph) {
 
-        visualisationController =
-          new VisualisationController();
+        if (VISUALIZATION) {
+            visualisationController = new VisualisationController();
+        }
 
         logger.debug("graph: " + initialGraph);
-        visualisationController.initializeGraphDisplay(initialGraph);
+        
+        if (VISUALIZATION) {
+            visualisationController.initializeGraphDisplay(initialGraph);
+        }
 
         Holder<F2<MuvtoGraph, Integer, MuvtoGraph>> step
             = new Holder<>();
@@ -80,7 +86,9 @@ public class Simulation {
 
         step.f.f(initialGraph, steps);
 
-        visualisationController.stopVisualisation();
+        if (VISUALIZATION) {
+            visualisationController.stopVisualisation();
+        }
 
         logger.debug("done");
     }
@@ -90,9 +98,9 @@ public class Simulation {
 
         logger.debug("STEP -------------------------------------------------");
 
-        logger.debug(" fill: " + extractEdgeAttrs(graph, MuvtoEdge::getFill));
-        logger.debug(" attr: " + extractEdgeAttrs(graph,
-                                    MuvtoEdge::getEffectiveAttractiveness));
+//        logger.debug(" fill: " + extractEdgeAttrs(graph, MuvtoEdge::getFill));
+//        logger.debug(" attr: " + extractEdgeAttrs(graph,
+//                                    MuvtoEdge::getEffectiveAttractiveness));
 
         MuvtoProblem problem = new MuvtoProblem(graph, maxTransfer);
 
@@ -112,7 +120,9 @@ public class Simulation {
 //        newGraph
 //            = transformer.graphTrafficDelta(newGraph, maxDelta);
 
-        visualisationController.updateGraph(newGraph, solution);
+        if (VISUALIZATION) {
+            visualisationController.updateGraph(newGraph, solution);
+        }
 
         predictor.updateData(graph);
         MuvtoGraph predictedGraph = predictor.getPredictedGraph(graph);

@@ -20,6 +20,7 @@ import pl.edu.agh.muvto.solver.GraphTransformer;
 import pl.edu.agh.muvto.solver.MuvtoProblem;
 import pl.edu.agh.muvto.solver.MuvtoSolverProvider;
 import pl.edu.agh.muvto.util.Holder;
+import pl.edu.agh.muvto.visualisation.VisualisationController;
 
 @Component
 public class Simulation {
@@ -44,14 +45,19 @@ public class Simulation {
 
     @Value("${muvto.simulation.steps}")
     private int steps;
-    
+
     @Value("${muvto.simulation.sleep}")
     private int sleep;
 
+    private VisualisationController visualisationController;
 
     public void runSimulation(MuvtoGraph initialGraph) {
 
+        visualisationController =
+          new VisualisationController();
+
         logger.debug("graph: " + initialGraph);
+        visualisationController.initializeGraphDisplay(initialGraph);
 
         Holder<F2<MuvtoGraph, Integer, MuvtoGraph>> step
             = new Holder<>();
@@ -73,6 +79,8 @@ public class Simulation {
         };
 
         step.f.f(initialGraph, steps);
+
+        visualisationController.stopVisualisation();
 
         logger.debug("done");
     }
@@ -103,6 +111,8 @@ public class Simulation {
 
 //        newGraph
 //            = transformer.graphTrafficDelta(newGraph, maxDelta);
+
+        visualisationController.updateGraph(newGraph, solution);
 
         predictor.updateData(graph);
         MuvtoGraph predictedGraph = predictor.getPredictedGraph(graph);

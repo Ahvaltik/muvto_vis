@@ -97,10 +97,14 @@ public class Visualiser{
             int h = GradientPanel.this.getHeight();
             Color color1 = Color.RED;
             Color color2 = Color.GREEN;
-            GradientPaint gp = new GradientPaint(0, 0, color1, 0, h, color2);
+            GradientPaint gp = new GradientPaint(0, 5, color1, 0, h, color2);
             g2d.setPaint(gp);
             g2d.fillRect(25, 0, w - 25, h);
-            g2d.drawString("0" , 0, 0); //TODO
+            g2d.setFont(new Font("TimesRoman", Font.PLAIN, 10));
+            g2d.setColor(Color.black);
+            g2d.drawString("100%" , 0, 10);
+            g2d.drawString("50%" , 0, h / 2 - 5);
+            g2d.drawString("0%" , 0, h - 5);
         }
     }
 }

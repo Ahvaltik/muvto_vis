@@ -3,7 +3,6 @@ package pl.edu.agh.muvto.visualisation;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
-import org.graphstream.ui.view.View;
 import org.graphstream.ui.view.Viewer;
 import org.uma.jmetal.solution.BinarySolution;
 import pl.edu.agh.muvto.model.MuvtoEdge;
@@ -63,9 +62,15 @@ public class Visualiser{
         JFrame myJFrame = new JFrame();
         Viewer viewer = new Viewer(visualisedGraph, Viewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD);
         viewer.enableAutoLayout();
-        View view = viewer.addDefaultView(false);   // false indicates "no JFrame".
+        Component view = viewer.addDefaultView(false);   // false indicates "no JFrame".
         myJFrame.setSize(800, 600);
-        myJFrame.add((Component) view);
+        Container contentPane = myJFrame.getContentPane();
+        contentPane.setLayout(new BorderLayout());
+        GradientPanel gradientPanel = new GradientPanel();
+
+        gradientPanel.setPreferredSize(new Dimension(50, 600));
+        contentPane.add(view);
+        contentPane.add(gradientPanel, BorderLayout.EAST);
         myJFrame.setVisible(true);
     }
 
@@ -79,6 +84,23 @@ public class Visualiser{
         for(MuvtoEdge muvtoEdge: referenceGraph.edgeSet()){
             Edge e = mapping.getEdge(muvtoEdge);
             e.addAttribute("ui.color", muvtoEdge.getWeight());
+        }
+    }
+
+    private class GradientPanel extends JPanel {
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            Graphics2D g2d = (Graphics2D) g;
+            g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+            int w = GradientPanel.this.getWidth();
+            int h = GradientPanel.this.getHeight();
+            Color color1 = Color.RED;
+            Color color2 = Color.GREEN;
+            GradientPaint gp = new GradientPaint(0, 0, color1, 0, h, color2);
+            g2d.setPaint(gp);
+            g2d.fillRect(25, 0, w - 25, h);
+            g2d.drawString("0" , 0, 0); //TODO
         }
     }
 }

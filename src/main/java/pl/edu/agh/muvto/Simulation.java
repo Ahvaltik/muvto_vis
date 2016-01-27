@@ -51,7 +51,7 @@ public class Simulation {
 
     private VisualisationController visualisationController;
     
-    private static final boolean VISUALIZATION = false;
+    private static final boolean VISUALIZATION = true;
 
     public void runSimulation(MuvtoGraph initialGraph) {
 

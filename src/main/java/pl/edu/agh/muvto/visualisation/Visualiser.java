@@ -3,11 +3,16 @@ package pl.edu.agh.muvto.visualisation;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
+import org.graphstream.ui.view.View;
+import org.graphstream.ui.view.Viewer;
 import org.uma.jmetal.solution.BinarySolution;
 import pl.edu.agh.muvto.model.MuvtoEdge;
 import pl.edu.agh.muvto.model.MuvtoGraph;
 import pl.edu.agh.muvto.model.MuvtoVertex;
 import pl.edu.agh.muvto.visualisation.mapping.GraphMapping;
+
+import javax.swing.*;
+import java.awt.*;
 
 public class Visualiser{
     private Graph visualisedGraph;
@@ -54,7 +59,14 @@ public class Visualiser{
         // Curving edges with same vertices and opposite directions
         System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
         updateColor();
-        visualisedGraph.display();
+        //visualisedGraph.display();
+        JFrame myJFrame = new JFrame();
+        Viewer viewer = new Viewer(visualisedGraph, Viewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD);
+        viewer.enableAutoLayout();
+        View view = viewer.addDefaultView(false);   // false indicates "no JFrame".
+        myJFrame.setSize(800, 600);
+        myJFrame.add((Component) view);
+        myJFrame.setVisible(true);
     }
 
     public void updateGraph(MuvtoGraph graph, BinarySolution solution) {
